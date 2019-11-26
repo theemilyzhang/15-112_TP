@@ -8,6 +8,7 @@ class Board(object):
         self.grid = self.createPath(self.startRow, [ ([None] * self.size) for row in range(self.size) ])
 
 
+# it do be like that sometimes
 
     def createPath(self, startRow, startGrid):
         #TODO use backtracking + random to create length n path from left to right starting at startRow

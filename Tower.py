@@ -1,3 +1,5 @@
+from mathFunctions import *
+
 class Tower(object):
     price = 20
     towerRange = 200
@@ -53,8 +55,6 @@ class Bullet(object):
 
     def checkCollision(self, onBalloons):
         #note: bullet is at new location (already been moved)
-        bx = self.location[0]
-        by = self.location[1]
         for balloon in onBalloons:
             if self.collidedWithBalloon(balloon):
                 #decrement balloon hp, then remove if dead
@@ -97,13 +97,5 @@ class Bullet(object):
         return False
 
 
-def getDistance(x0, y0, x1, y1):
-    return ((x1 - x0)**2 + (y1 - y0)**2)**.5
 
-def solveIntersectX(slope1, x1, y1, slope2, x2, y2): #returns x-value of intersection
-    #format: slope1(x-x1) + y1 = slope2(x-x2) + y2
-    xCoefficient = slope1 - slope2 #left side
-    constants = -slope2*(x2) + y2 + slope1*(x1) - y1
-    x = constants/xCoefficient
-    return x
 

@@ -6,10 +6,16 @@ import Tower
 import Balloon
 import Board
 
-
+#animation and graphics framework from http://www.cs.cmu.edu/~112/notes/notes-animations-part1.html
+#modal app from http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
+#tower image from https://www.pngguru.com/free-transparent-background-png-clipart-lbpet/download
+#sky image from http://www.alpharoofinginc.com/roofing-sky-background-3-2-jpg/
 
 def runGame():
     class SplashScreenMode(Mode):
+        def appStarted(mode):
+            mode.backgroundImage = mode.loadImage("sky.jpg")
+
         def mousePressed(mode, event):
             x = event.x
             y = event.y
@@ -17,18 +23,13 @@ def runGame():
             height = mode.app.height
 
             # 1 player button
-            if (x >= width*1//10 and x <= width*3//10 and
-                    y >= height*3//4 and y <= height*7//8):
+            if (width*1//10 <= x <= width*3//10 and
+                height*3//4 <= y <= height*7//8):
                 mode.app.setActiveMode(mode.app.onePlayerMode)
 
-            #versus AI button
-            if (x >= width*4//10 and x <= width*6//10 and
-                    y >= height*3//4 and y <= height*7//8):
-                mode.app.setActiveMode(mode.app.AIMode)
-
             #2 player button
-            if (x >= width*7//10 and x <= width*9//10 and
-                    y >= height*3//4 and y <= height*7//8):
+            if (width*7//10 <= x <= width*9//10 and
+                height*3//4 <= y <= height*7//8):
                 mode.app.setActiveMode(mode.app.twoPlayerMode)
 
 
@@ -36,6 +37,7 @@ def runGame():
             width = mode.app.width
             height = mode.app.height
             #todo: draw background
+            canvas.create_image(mode.app.width//2, mode.app.height//2, image=ImageTk.PhotoImage(mode.backgroundImage))
 
             #draw logo
             #todo: add image later
@@ -90,6 +92,39 @@ def runGame():
                 else:
                     balIndex += 1
 
+            balIndex = 0
+            while(balIndex < len(mode.player.onBalloons)):
+                balloon = mode.player.onBalloons[balIndex]
+                curX = balloon.position[0]
+                curY = balloon.position[1]
+
+                #see if direct path to end works
+                #1: find direct dx/dy
+                dxDirect, dyDirect = mode.board.getDirectDxDy(curX, curY)
+                #2: move balloon by that dx/dy
+                oldX = balloon.position[0]
+                oldY = balloon.position[1]
+                newX = oldX + (dxDirect * balloon.speed)
+                newY = oldY + (dyDirect * balloon.speed)
+                balloon.location = (newX, newY)
+                balloon.distanceTraveled += balloon.speed
+                #3: check for collision w tower radius
+                if balloon.checkCollision(mode.player.towers, dxDirect, dyDirect):
+                    #if direct path doesn't work, undo movement and try other angles
+                    balloon.location = (oldX, oldY)
+                    balloon.distanceTraveled -= balloon.speed
+                    dx, dy = balloon.getWorkingDirection(mode.player.towers, dxDirect, dyDirect) #TODO write this
+                    newX = oldX + (dx * balloon.speed)
+                    newY = oldY + (dy * balloon.speed)
+                    balloon.location = (newX, newY)
+                    balloon.distanceTraveled += balloon.speed
+
+                #if balloon exited board, decrement player HP by balloon's remaining HP
+                if newX >= mode.app.width or newY >= mode.app.height:
+                    mode.player.hp -= balloon.hp
+
+
+            """
             #move every balloon on the board by speed * (dx, dy)
             for balloon in mode.player.onBalloons:
                 curX = balloon.position[0]
@@ -106,6 +141,7 @@ def runGame():
                     newY = curY + yTraveled
                     balloon.distanceTraveled += (xTraveled + yTraveled)
                     balloon.position = (newX, newY)
+            """
 
             #TOWERS
             for tower in mode.player.towers:
@@ -161,15 +197,15 @@ def runGame():
 
 
         def redrawAll(mode, canvas):
-            #TODO draw background
             mode.drawBoard(canvas) #includes bg image
             mode.drawTopBanner(canvas)
-
             mode.drawBalloons(canvas)
             mode.drawTowers(canvas)
             mode.drawBullets(canvas)
+
             #TODO finish draw instructions (if in certain placing modes)
             mode.drawInstructions(canvas)
+
             if len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0:
                 #TODO draw win screen (mode)
                 pass
@@ -193,19 +229,14 @@ def runGame():
             canvas.create_text(100, mode.board.topMargin//2, text="B11oons 2ower Defense")
             #TODO change text to logo ^
 
-        def drawBottomBanner(mode, canvas):
-            width = mode.app.width
-            height = mode.app.height
-            canvas.create_rectangle(0, height - mode.board.bottomMargin, width, height, fill="light blue")
-
-            canvas.create_text(0, height - mode.board.bottomMargin, text="Message Board", anchor="nw")
-
         def drawBoard(mode, canvas):
             canvas.create_image(mode.app.width//2, mode.app.height//2, image=ImageTk.PhotoImage(mode.backgroundImage))
+            """
             for row in range(mode.board.size):
                 for col in range(mode.board.size):
                     if mode.board.grid[row][col] != None:
                         canvas.create_rectangle(mode.board.getCellBounds(row, col), fill="yellow")
+            """
 
         def drawBalloons(mode, canvas):
             for balloon in mode.player.onBalloons:
@@ -228,25 +259,6 @@ def runGame():
                 r = bullet.radius
                 canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="black")
 
-
-
-
-    class AIMode(OnePlayerMode):
-        def appStarted(mode):
-            pass
-
-        def timerFired(mode):
-            pass
-
-        def mousePressed(mode, event):
-            pass
-
-        def keyPressed(mode, event):
-            pass
-
-        def redrawAll(mode, canvas):
-            pass
-
     class TwoPlayerMode(Mode):
         def appStarted(mode):
             pass
@@ -267,7 +279,6 @@ def runGame():
         def appStarted(app):
             app.splashScreenMode = SplashScreenMode()
             app.onePlayerMode = OnePlayerMode()
-            app.AIMode = AIMode()
             app.twoPlayerMode = TwoPlayerMode()
             app.setActiveMode(app.splashScreenMode)
 

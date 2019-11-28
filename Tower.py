@@ -5,8 +5,7 @@ class Tower(object):
     towerRange = 200
     def __init__(self, location):
         self.location = location #tuple
-        self.halfHeight = 30
-        self.halfWidth = 10
+        self.radius = 30
         self.defaultCoolDown = 20
         self.currentCoolDown = self.defaultCoolDown - 1
 

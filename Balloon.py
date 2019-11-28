@@ -13,6 +13,77 @@ class Balloon(object):
         self.coins = 1
         self.angleIncrement = math.pi/16
 
+    def getDirection(self, towers, endX, endY):
+        bx = self.position[0]
+        by = self.position[1]
+        defaultAngle = getAngle(bx, by, endX, endY)
+        brange = []
+
+        for tower in towers:
+            tx = tower.location[0]
+            ty = tower.location[1]
+            hypotenuse = getDistance(bx, by, tx, ty) #distance between centers, always positive
+            oppositeSide = tower.radius
+            dTheta = math.asin(oppositeSide/hypotenuse) #positive, 0 to pi
+            angleFromBalloonToTower = getAngle(bx, by, tx, ty)
+
+            restriction = (angleFromBalloonToTower - dTheta, angleFromBalloonToTower + dTheta)
+            #make all numbers [0, 2pi)
+            if restriction[0] < 0:
+                restriction = (restriction[0] + 2*math.pi, restriction[1])
+            if restriction[1] < 0:
+                restriction = (restriction[0], restriction[1] + 2*math.pi)
+            brange = self.updateBRange(brange, restriction)
+
+        return self.getBestDirection(defaultAngle, brange)
+
+
+    def updateBRange(self, brange, restriction):
+        if brange == []:
+            if restriction[1] > restriction[0]:
+                r1 = (0, restriction[0])
+                r2 = (restriction[1], 2*math.pi)
+                brange.append(r1)
+                brange.append(r2)
+            else:
+                brange.append((restriction[1], restriction[0]))
+        else:
+            index = 0
+            while index < len(brange):
+                curTuple = brange[index] #copy, not a reference
+                #if both ends of restriction w/in curTuple, create 2 new restriction tuples
+                if (curTuple[0] < restriction[0] < curTuple[1] and
+                        curTuple[0] < restriction[1] < curTuple[1]):
+                    brange[index] = (curTuple[0], restriction[0])
+                    newTuple = (restriction[1], curTuple[1])
+                    brange.insert(index+1, newTuple)
+                    index += 2
+                elif (curTuple[0] < restriction[0] < curTuple[1]):
+                    brange[index] = (curTuple[0], restriction[0])
+                    index += 1
+                elif (curTuple[0] < restriction[1] < curTuple[1]):
+                    brange[index] = (restriction[1], curTuple[1])
+                    index += 1
+                else:
+                    index += 1
+
+    def getBestDirection(self, defaultAngle, brange):
+        #if defaultAngle is legal, return that
+        for tuple in brange:
+            if tuple[0] <= defaultAngle <= tuple[1]:
+                return defaultAngle
+        #otherwise, check for the closest legal angle to defaultAngle
+        bestAngle = defaultAngle + 2*math.pi #every possible angle will be better than this
+        for tuple in brange:
+            if getDifferenceBetweenTwoAngles(tuple[0], defaultAngle) < getDifferenceBetweenTwoAngles(bestAngle, defaultAngle):
+                bestAngle = tuple[0]
+            if getDifferenceBetweenTwoAngles(tuple[1], defaultAngle) < getDifferenceBetweenTwoAngles(bestAngle, defaultAngle):
+                bestAngle = tuple[1]
+        return bestAngle
+
+
+
+
     def checkCollision(self, towers, dx, dy):
         #balloon has already been moved
         for tower in towers:

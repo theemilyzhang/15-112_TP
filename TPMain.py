@@ -92,56 +92,9 @@ def runGame():
                 else:
                     balIndex += 1
 
-            balIndex = 0
-            while(balIndex < len(mode.player.onBalloons)):
-                balloon = mode.player.onBalloons[balIndex]
-                curX = balloon.position[0]
-                curY = balloon.position[1]
-
-                #see if direct path to end works
-                #1: find direct dx/dy
-                dxDirect, dyDirect = mode.board.getDirectDxDy(curX, curY)
-                #2: move balloon by that dx/dy
-                oldX = balloon.position[0]
-                oldY = balloon.position[1]
-                newX = oldX + (dxDirect * balloon.speed)
-                newY = oldY + (dyDirect * balloon.speed)
-                balloon.location = (newX, newY)
-                balloon.distanceTraveled += balloon.speed
-                #3: check for collision w tower radius
-                if balloon.checkCollision(mode.player.towers, dxDirect, dyDirect):
-                    #if direct path doesn't work, undo movement and try other angles
-                    balloon.location = (oldX, oldY)
-                    balloon.distanceTraveled -= balloon.speed
-                    dx, dy = balloon.getWorkingDirection(mode.player.towers, dxDirect, dyDirect) #TODO write this
-                    newX = oldX + (dx * balloon.speed)
-                    newY = oldY + (dy * balloon.speed)
-                    balloon.location = (newX, newY)
-                    balloon.distanceTraveled += balloon.speed
-
-                #if balloon exited board, decrement player HP by balloon's remaining HP
-                if newX >= mode.app.width or newY >= mode.app.height:
-                    mode.player.hp -= balloon.hp
-
-
-            """
-            #move every balloon on the board by speed * (dx, dy)
             for balloon in mode.player.onBalloons:
-                curX = balloon.position[0]
-                curY = balloon.position[1]
-                #find row, col that balloon is currently in
-                curRow, curCol = mode.board.getCell(curX, curY)
-                if (0 <= curRow <= mode.board.size and 0 <= curCol <= mode.board.size):
-                    #find corresponding dx, dy for given row, col
-                    dx, dy = mode.board.grid[curRow][curCol]
-                    #assign new position to balloon
-                    xTraveled = balloon.speed * dx
-                    yTraveled = balloon.speed * dy
-                    newX = curX + xTraveled
-                    newY = curY + yTraveled
-                    balloon.distanceTraveled += (xTraveled + yTraveled)
-                    balloon.position = (newX, newY)
-            """
+                dx, dy = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
+
 
             #TOWERS
             for tower in mode.player.towers:
@@ -252,7 +205,6 @@ def runGame():
                 canvas.create_image(x, y, image=ImageTk.PhotoImage(mode.towerImage))
 
         def drawBullets(mode, canvas):
-            print (mode.player.bullets)
             for bullet in mode.player.bullets:
                 cx = bullet.location[0]
                 cy = bullet.location[1]

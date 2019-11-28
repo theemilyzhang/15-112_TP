@@ -95,8 +95,9 @@ def runGame():
 
             for balloon in mode.player.onBalloons:
                 direction = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
-                dx, dy = math.cos(direction), math.sin(direction) #unit vectors
-                balloon.position = (balloon.position[0] + dx, balloon.position[1] + dy) * balloon.speed
+                dx, dy = math.cos(direction), -math.sin(direction) #unit vectors
+                print (dx, dy)
+                balloon.position = ((balloon.position[0] + dx)* balloon.speed, (balloon.position[1] + dy)* balloon.speed)
                 balloon.distanceTraveled += balloon.speed
 
 
@@ -188,16 +189,10 @@ def runGame():
 
         def drawBoard(mode, canvas):
             canvas.create_image(mode.app.width//2, mode.app.height//2, image=ImageTk.PhotoImage(mode.backgroundImage))
-            """
-            for row in range(mode.board.size):
-                for col in range(mode.board.size):
-                    if mode.board.grid[row][col] != None:
-                        canvas.create_rectangle(mode.board.getCellBounds(row, col), fill="yellow")
-            """
 
         def drawBalloons(mode, canvas):
             for balloon in mode.player.onBalloons:
-                cx, cy = balloon.position
+                cx, cy = balloon.position[0], balloon.position[1]
                 r = balloon.radius
                 #TODO change this to an image roughly 20x20 pixels
                 canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill=balloon.color, width=0)

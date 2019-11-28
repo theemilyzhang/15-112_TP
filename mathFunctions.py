@@ -10,7 +10,7 @@ def solveIntersectX(slope1, x1, y1, slope2, x2, y2): #returns x-value of interse
     x = constants/xCoefficient
     return x
 
-def getAngle(self, startX, startY, endX, endY):
+def getAngle(startX, startY, endX, endY):
     #domain of angle: 0 to pi/2, 3pi/2 to 2pi
     deltaX = endX - startX
     deltaY = startY - endY

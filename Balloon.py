@@ -33,7 +33,7 @@ class Balloon(object):
                 restriction = (restriction[0] + 2*math.pi, restriction[1])
             if restriction[1] < 0:
                 restriction = (restriction[0], restriction[1] + 2*math.pi)
-            brange = self.updateBRange(brange, restriction)
+            self.updateBRange(brange, restriction)
 
         return self.getBestDirection(defaultAngle, brange)
 

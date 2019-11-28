@@ -96,8 +96,7 @@ def runGame():
             for balloon in mode.player.onBalloons:
                 direction = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
                 dx, dy = math.cos(direction), -math.sin(direction) #unit vectors
-                print (dx, dy)
-                balloon.position = ((balloon.position[0] + dx)* balloon.speed, (balloon.position[1] + dy)* balloon.speed)
+                balloon.position = (balloon.position[0] + dx*balloon.speed, balloon.position[1] + dy*balloon.speed)
                 balloon.distanceTraveled += balloon.speed
 
 

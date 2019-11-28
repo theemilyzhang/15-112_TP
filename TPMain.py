@@ -5,6 +5,7 @@ import Player
 import Tower
 import Balloon
 import Board
+import math
 
 #animation and graphics framework from http://www.cs.cmu.edu/~112/notes/notes-animations-part1.html
 #modal app from http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
@@ -93,7 +94,10 @@ def runGame():
                     balIndex += 1
 
             for balloon in mode.player.onBalloons:
-                dx, dy = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
+                direction = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
+                dx, dy = math.cos(direction), math.sin(direction) #unit vectors
+                balloon.position = (balloon.position[0] + dx, balloon.position[1] + dy) * balloon.speed
+                balloon.distanceTraveled += balloon.speed
 
 
             #TOWERS

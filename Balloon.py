@@ -73,7 +73,7 @@ class Balloon(object):
             if tuple[0] <= defaultAngle <= tuple[1]:
                 return defaultAngle
         #otherwise, check for the closest legal angle to defaultAngle
-        bestAngle = defaultAngle + 2*math.pi #every possible angle will be better than this
+        bestAngle = brange[0][0] #every possible angle will be better than this
         for tuple in brange:
             if getDifferenceBetweenTwoAngles(tuple[0], defaultAngle) < getDifferenceBetweenTwoAngles(bestAngle, defaultAngle):
                 bestAngle = tuple[0]

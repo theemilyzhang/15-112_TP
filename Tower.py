@@ -6,12 +6,9 @@ class Tower(object):
     def __init__(self, location):
         self.location = location #tuple
         self.radius = 30
+        #TODO check if ^ is accurate
         self.defaultCoolDown = 20
         self.currentCoolDown = self.defaultCoolDown - 1
-
-        #TODO check if ^ is accurate
-
-
 
     def createBulletIfInRange(self, onBalloons):
         #find balloon with max dist traveled that's also in range
@@ -39,6 +36,14 @@ class Tower(object):
             #return bullet with location of tower and dx dy according to balloon it's shooting at
 
         return None
+
+class SuperTower(Tower): #faster cooldown, shoots by predicting balloon position
+    price = 40
+    towerRange = 200
+    def __init__(self, location):
+        super().__init__(location)
+        self.defaultCoolDown = 10
+        self.currentCoolDown = self.defaultCoolDown - 1
 
 class Bullet(object):
 

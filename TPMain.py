@@ -146,11 +146,21 @@ def runGame():
                 mode.player.coins -= Tower.Tower.price
                 mode.player.isPlacingTower = False
 
+            elif mode.player.isPlacingSuperTower:
+                newTower = Tower.SuperTower((event.x, event.y))
+                mode.player.towers.append(newTower)
+                mode.player.coins -= Tower.SuperTower.price
+                mode.player.isPlacingSuperTower = False
+
+
 
         def keyPressed(mode, event):
             if (event.key == "t"):
                 if mode.player.coins >= Tower.Tower.price:
                     mode.player.isPlacingTower = True
+            if (event.key == "T"):
+                if mode.player.coins >= Tower.SuperTower.price:
+                    mode.player.isPlacingSuperTower = True
 
 
         def redrawAll(mode, canvas):

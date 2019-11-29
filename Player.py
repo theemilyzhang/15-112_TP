@@ -5,10 +5,11 @@ import Tower
 class Player(object):
     def __init__(self):
         self.hp = 50
-        self.coins = 20
+        self.coins = 200
         self.towers = []
         self.bullets = []
         self.isPlacingTower = False
+        self.isPlacingSuperTower = False
 
         self.offBalloons = self.createBalloons()
         self.onBalloons = []

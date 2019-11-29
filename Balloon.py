@@ -68,6 +68,9 @@ class Balloon(object):
                     index += 1
 
     def getBestDirection(self, defaultAngle, brange):
+        #if brange == [], all directions possible, so auto return default
+        if brange == []:
+            return defaultAngle
         #if defaultAngle is legal, return that
         for tuple in brange:
             if tuple[0] <= defaultAngle <= tuple[1]:

@@ -14,7 +14,7 @@ def getAngle(startX, startY, endX, endY):
     #domain of angle: 0 to pi/2, 3pi/2 to 2pi
     deltaX = endX - startX
     deltaY = startY - endY
-    angle = math.atan(deltaY/deltaX)
+    angle = math.atan2(deltaY, deltaX)
     if angle < 0:
         angle += 2*math.pi
     return angle

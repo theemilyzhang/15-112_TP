@@ -22,9 +22,14 @@ class Balloon(object):
         for tower in towers:
             tx = tower.location[0]
             ty = tower.location[1]
-            hypotenuse = getDistance(bx, by, tx, ty) #distance between centers, always positive
-            oppositeSide = tower.radius
-            dTheta = math.asin(oppositeSide/hypotenuse) #positive, 0 to pi
+            hypotenuse1 = getDistance(bx, by, tx, ty) #distance between centers, always positive
+            oppositeSide1 = tower.radius
+            dTheta1 = math.asin(oppositeSide1/hypotenuse1) #positive, 0 to pi
+            hypotenuse2 = (hypotenuse1**2 - oppositeSide1**2)**.5
+            oppositeSide2 = self.radius
+            dTheta2 = math.asin(oppositeSide2/hypotenuse2)
+            dTheta = dTheta1 + dTheta2
+
             angleFromBalloonToTower = getAngle(bx, by, tx, ty)
 
             restriction = (angleFromBalloonToTower - dTheta, angleFromBalloonToTower + dTheta)

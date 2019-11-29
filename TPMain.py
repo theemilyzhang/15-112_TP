@@ -111,7 +111,7 @@ def runGame():
                 else:
                     tower.currentCoolDown -= 1
 
-
+            """
             #BULLETS
             bulIndex = 0
             while (bulIndex < len(mode.player.bullets)):
@@ -135,6 +135,7 @@ def runGame():
 
                 else:
                     bulIndex += 1
+            """
 
 
         def mousePressed(mode, event):
@@ -185,6 +186,8 @@ def runGame():
             #placing towers
             if mode.player.isPlacingTower:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Arial 30 bold")
+            if mode.player.isPlacingSuperTower:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the super tower placed.", font="Arial 30 bold")
 
         def drawTopBanner(mode, canvas):
             width = mode.app.width

@@ -210,7 +210,9 @@ def runGame():
             for tower in mode.player.towers:
                 x = tower.location[0]
                 y = tower.location[1]
-                canvas.create_image(x, y, image=ImageTk.PhotoImage(mode.towerImage))
+                r = tower.radius
+                canvas.create_oval(x-r, y-r, x+r, y+r, fill="black")
+                #canvas.create_image(x, y, image=ImageTk.PhotoImage(mode.towerImage))
 
         def drawBullets(mode, canvas):
             for bullet in mode.player.bullets:

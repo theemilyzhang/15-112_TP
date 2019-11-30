@@ -44,6 +44,10 @@ class Balloon(object):
                 restriction = (restriction[0] + 2*math.pi, restriction[1])
             if restriction[1] < 0:
                 restriction = (restriction[0], restriction[1] + 2*math.pi)
+            if restriction[0] > 2*math.pi:
+                restriction = (restriction[0] - 2*math.pi, restriction[1])
+            if restriction[1] > 2*math.pi:
+                restriction = (restriction[0], restriction[1] - 2*math.pi)
             self.updateBRange(brange, restriction)
 
         print(brange)

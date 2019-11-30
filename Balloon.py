@@ -64,24 +64,80 @@ class Balloon(object):
             else:
                 brange.append((restriction[1], restriction[0]))
         else:
-            index = 0
-            while index < len(brange):
-                curTuple = brange[index] #copy, not a reference
-                #if both ends of restriction w/in curTuple, create 2 new restriction tuples
-                if (curTuple[0] < restriction[0] < curTuple[1] and
-                        curTuple[0] < restriction[1] < curTuple[1]):
-                    brange[index] = (curTuple[0], restriction[0])
-                    newTuple = (restriction[1], curTuple[1])
-                    brange.insert(index+1, newTuple)
-                    index += 2
-                elif (curTuple[0] < restriction[0] < curTuple[1]):
-                    brange[index] = (curTuple[0], restriction[0])
-                    index += 1
-                elif (curTuple[0] < restriction[1] < curTuple[1]):
-                    brange[index] = (restriction[1], curTuple[1])
-                    index += 1
-                else:
-                    index += 1
+            if restriction[0] > restriction[1]:
+                # this "passes go", so to speak, so we want to logically break it up into two restrictions that don't "pass go"
+                r1 = (0, restriction[1])
+                r2 = (restriction[0], 2 * math.pi)
+
+                index = 0
+                while index < len(brange):
+                    curTuple = brange[index]  # copy, not a reference
+                    if (curTuple[0] <= r1[0] <= curTuple[1] and curTuple[0] <= r1[1] <= curTuple[1]):
+                        # if both ends of restriction w/in curTuple, create 2 new restriction tuples
+                        brange[index] = (curTuple[0], r1[0])
+                        newTuple = (r1[1], curTuple[1])
+                        brange.insert(index + 1, newTuple)
+                        index += 2
+                    elif (r1[0] <= curTuple[0] <= r1[1] and r1[0] <= curTuple[1] <= r1[1]):
+                        # if the restriction tuple completely envelops the current tuple, just get rid of the current tuple
+                        brange.pop(index)
+                    elif (curTuple[0] <= r1[0] <= curTuple[1]):
+                        brange[index] = (curTuple[0], r1[0])
+                        index += 1
+                    elif (curTuple[0] <= r1[1] <= curTuple[1]):
+                        brange[index] = (r1[1], curTuple[1])
+                        index += 1
+                    else:
+                        index += 1
+
+                index = 0
+                while index < len(brange):
+                    curTuple = brange[index]  # copy, not a reference
+                    if (curTuple[0] <= r2[0] <= curTuple[1] and curTuple[0] <= r2[1] <= curTuple[1]):
+                        # if both ends of restriction w/in curTuple, create 2 new restriction tuples
+                        brange[index] = (curTuple[0], r2[0])
+                        newTuple = (r2[1], curTuple[1])
+                        brange.insert(index + 1, newTuple)
+                        index += 2
+                    elif (r2[0] <= curTuple[0] <= r2[1] and r2[0] <= curTuple[1] <= r2[1]):
+                        # if the restriction tuple completely envelops the current tuple, just get rid of the current tuple
+                        brange.pop(index)
+                    elif (curTuple[0] <= r2[0] <= curTuple[1]):
+                        brange[index] = (curTuple[0], r2[0])
+                        index += 1
+                    elif (curTuple[0] <= r2[1] <= curTuple[1]):
+                        brange[index] = (r2[1], curTuple[1])
+                        index += 1
+                    else:
+                        index += 1
+            else:
+                index = 0
+                while index < len(brange):
+                    curTuple = brange[index]  # copy, not a reference
+                    if (curTuple[0] <= restriction[0] <= curTuple[1] and curTuple[0] <= restriction[1] <= curTuple[1]):
+                        # if both ends of restriction w/in curTuple, create 2 new restriction tuples
+                        brange[index] = (curTuple[0], restriction[0])
+                        newTuple = (restriction[1], curTuple[1])
+                        brange.insert(index + 1, newTuple)
+                        index += 2
+                    elif (restriction[0] <= curTuple[0] <= restriction[1] and restriction[0] <= curTuple[1] <= restriction[1]):
+                        # if the restriction tuple completely envelops the current tuple, just get rid of the current tuple
+                        brange.pop(index)
+                    elif (curTuple[0] <= restriction[0] <= curTuple[1]):
+                        brange[index] = (curTuple[0], restriction[0])
+                        index += 1
+                    elif (curTuple[0] <= restriction[1] <= curTuple[1]):
+                        brange[index] = (restriction[1], curTuple[1])
+                        index += 1
+                    else:
+                        index += 1
+        index = 0
+        while index < len(brange):
+            # get rid of any ranges that are 0 in size
+            if brange[index][0] == brange[index][1]:
+                brange.pop(index)
+            else:
+                index += 1
 
     def getBestDirection(self, defaultAngle, brange):
         #if brange == [], all directions possible, so auto return default

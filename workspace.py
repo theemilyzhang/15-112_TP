@@ -11,16 +11,10 @@ def getDirection(bx, by, towers, endX, endY):
         ty = tower.location[1]
         hypotenuse1 = getDistance(bx, by, tx, ty) #distance between centers, always positive
         oppositeSide1 = tower.radius
-        try:
-            dTheta1 = math.asin(oppositeSide1/hypotenuse1) #positive, 0 to pi
-        except:
-            print("ok")
+        dTheta1 = math.asin(oppositeSide1/hypotenuse1) #positive, 0 to pi
         hypotenuse2 = (hypotenuse1**2 - oppositeSide1**2)**.5
         oppositeSide2 = 10
-        try:
-            dTheta2 = math.asin(oppositeSide2/hypotenuse2)
-        except:
-            print("ok")
+        dTheta2 = math.asin(oppositeSide2/hypotenuse2)
         dTheta = dTheta1 + dTheta2
 
         angleFromBalloonToTower = getAngle(bx, by, tx, ty)
@@ -31,6 +25,10 @@ def getDirection(bx, by, towers, endX, endY):
             restriction = (restriction[0] + 2*math.pi, restriction[1])
         if restriction[1] < 0:
             restriction = (restriction[0], restriction[1] + 2*math.pi)
+        if restriction[0] > 2*math.pi:
+            restriction = (restriction[0] - 2*math.pi, restriction[1])
+        if restriction[1] > 2*math.pi:
+            restriction = (restriction[0], restriction[1] - 2*math.pi)
         updateBRange(brange, restriction)
 
     print("brange:")
@@ -48,25 +46,81 @@ def updateBRange(brange, restriction):
         else:
             brange.append((restriction[1], restriction[0]))
     else:
+        if restriction[0] > restriction[1]:
+            # this "passes go", so to speak, so we want to logically break it up into two restrictions that don't "pass go"
+            r1 = (0, restriction[1])
+            r2 = (restriction[0], 2 * math.pi)
+
+            index = 0
+            while index < len(brange):
+                curTuple = brange[index]  # copy, not a reference
+                if (curTuple[0] <= r1[0] <= curTuple[1] and curTuple[0] <= r1[1] <= curTuple[1]):
+                    # if both ends of restriction w/in curTuple, create 2 new restriction tuples
+                    brange[index] = (curTuple[0], r1[0])
+                    newTuple = (r1[1], curTuple[1])
+                    brange.insert(index + 1, newTuple)
+                    index += 2
+                elif (r1[0] <= curTuple[0] <= r1[1] and r1[0] <= curTuple[1] <= r1[1]):
+                    # if the restriction tuple completely envelops the current tuple, just get rid of the current tuple
+                    brange.pop(index)
+                elif (curTuple[0] <= r1[0] <= curTuple[1]):
+                    brange[index] = (curTuple[0], r1[0])
+                    index += 1
+                elif (curTuple[0] <= r1[1] <= curTuple[1]):
+                    brange[index] = (r1[1], curTuple[1])
+                    index += 1
+                else:
+                    index += 1
+
+            index = 0
+            while index < len(brange):
+                curTuple = brange[index]  # copy, not a reference
+                if (curTuple[0] <= r2[0] <= curTuple[1] and curTuple[0] <= r2[1] <= curTuple[1]):
+                    # if both ends of restriction w/in curTuple, create 2 new restriction tuples
+                    brange[index] = (curTuple[0], r2[0])
+                    newTuple = (r2[1], curTuple[1])
+                    brange.insert(index + 1, newTuple)
+                    index += 2
+                elif (r2[0] <= curTuple[0] <= r2[1] and r2[0] <= curTuple[1] <= r2[1]):
+                    # if the restriction tuple completely envelops the current tuple, just get rid of the current tuple
+                    brange.pop(index)
+                elif (curTuple[0] <= r2[0] <= curTuple[1]):
+                    brange[index] = (curTuple[0], r2[0])
+                    index += 1
+                elif (curTuple[0] <= r2[1] <= curTuple[1]):
+                    brange[index] = (r2[1], curTuple[1])
+                    index += 1
+                else:
+                    index += 1
+        else:
+            index = 0
+            while index < len(brange):
+                curTuple = brange[index]  # copy, not a reference
+                if (curTuple[0] <= restriction[0] <= curTuple[1] and curTuple[0] <= restriction[1] <= curTuple[1]):
+                    # if both ends of restriction w/in curTuple, create 2 new restriction tuples
+                    brange[index] = (curTuple[0], restriction[0])
+                    newTuple = (restriction[1], curTuple[1])
+                    brange.insert(index + 1, newTuple)
+                    index += 2
+                elif (restriction[0] <= curTuple[0] <= restriction[1] and restriction[0] <= curTuple[1] <= restriction[1]):
+                    # if the restriction tuple completely envelops the current tuple, just get rid of the current tuple
+                    brange.pop(index)
+                elif (curTuple[0] <= restriction[0] <= curTuple[1]):
+                    brange[index] = (curTuple[0], restriction[0])
+                    index += 1
+                elif (curTuple[0] <= restriction[1] <= curTuple[1]):
+                    brange[index] = (restriction[1], curTuple[1])
+                    index += 1
+                else:
+                    index += 1
         index = 0
         while index < len(brange):
-            curTuple = brange[index]  # copy, not a reference
-            # if both ends of restriction w/in curTuple, create 2 new restriction tuples
-            if (curTuple[0] < restriction[0] < curTuple[1] and
-                    curTuple[0] < restriction[1] < curTuple[1]):
-                brange[index] = (curTuple[0], restriction[0])
-                newTuple = (restriction[1], curTuple[1])
-                brange.insert(index + 1, newTuple)
-                index += 2
-            elif (curTuple[0] < restriction[0] < curTuple[1]):
-                brange[index] = (curTuple[0], restriction[0])
-                index += 1
-            elif (curTuple[0] < restriction[1] < curTuple[1]):
-                brange[index] = (restriction[1], curTuple[1])
-                index += 1
+            # get rid of any ranges that are 0 in size
+            if brange[index][0] == brange[index][1]:
+                brange.pop(index)
             else:
                 index += 1
-
+        return
 
 def getBestDirection(defaultAngle, brange):
     # if brange == [], all directions possible, so auto return default
@@ -90,12 +144,15 @@ def getBestDirection(defaultAngle, brange):
 
 
 towers = []
-newTower = Tower.Tower((198, 148))
+newTower = Tower.Tower((192, 276))
 towers.append(newTower)
-newTower = Tower.Tower((233, 117))
+newTower = Tower.Tower((238, 245))
 towers.append(newTower)
-newTower = Tower.Tower((147, 169))
+newTower = Tower.Tower((329, 180))
 towers.append(newTower)
-newTower = Tower.Tower((245, 83))
+newTower = Tower.Tower((361, 142))
 towers.append(newTower)
-print(getDirection(407.8739693663817, 191.53310325342304, towers, 1200, 720))
+newTower = Tower.Tower((281, 208))
+towers.append(newTower)
+
+print(getDirection(323.1715255485856, 139.2524208674302, towers, 1200, 720))

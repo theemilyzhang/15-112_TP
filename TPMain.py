@@ -3,7 +3,6 @@ from cmu_112_graphics import *
 from tkinter import *
 import Player
 import Tower
-import Balloon
 import Board
 import math
 
@@ -111,7 +110,7 @@ def runGame():
                 else:
                     tower.currentCoolDown -= 1
 
-            """
+
             #BULLETS
             bulIndex = 0
             while (bulIndex < len(mode.player.bullets)):
@@ -135,7 +134,6 @@ def runGame():
 
                 else:
                     bulIndex += 1
-            """
 
 
         def mousePressed(mode, event):
@@ -171,7 +169,6 @@ def runGame():
             mode.drawTowers(canvas)
             mode.drawBullets(canvas)
 
-            #TODO finish draw instructions (if in certain placing modes)
             mode.drawInstructions(canvas)
 
             if len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0:
@@ -206,16 +203,16 @@ def runGame():
             for balloon in mode.player.onBalloons:
                 cx, cy = balloon.position[0], balloon.position[1]
                 r = balloon.radius
-                #TODO change this to an image roughly 20x20 pixels
+
                 canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill=balloon.color, width=0)
 
         def drawTowers(mode, canvas):
             for tower in mode.player.towers:
                 x = tower.location[0]
                 y = tower.location[1]
-                r = tower.radius
-                canvas.create_oval(x-r, y-r, x+r, y+r, fill="black")
-                #canvas.create_image(x, y, image=ImageTk.PhotoImage(mode.towerImage))
+                #r = tower.radius
+                #canvas.create_oval(x-r, y-r, x+r, y+r, fill="black")
+                canvas.create_image(x, y, image=ImageTk.PhotoImage(mode.towerImage))
 
         def drawBullets(mode, canvas):
             for bullet in mode.player.bullets:

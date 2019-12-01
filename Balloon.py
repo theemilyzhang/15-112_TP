@@ -159,9 +159,6 @@ class Balloon(object):
         print(bestAngle / math.pi * 180)
         return bestAngle
 
-
-
-
     def checkCollision(self, towers, dx, dy):
         #balloon has already been moved
         for tower in towers:
@@ -187,7 +184,6 @@ class Balloon(object):
 
         return False
 
-
     def getWorkingDirection(self, towers, startDx, startDy):
         #loop thru angles until find one that works
         counter = 1
@@ -208,3 +204,10 @@ class Balloon(object):
 
             counter += 1
         pass
+
+class FastBalloon(Balloon):
+    def __init__(self):
+        super().__init__()
+        self.color = "blue"
+        self.speed = 10
+

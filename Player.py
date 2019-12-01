@@ -19,8 +19,10 @@ class Player(object):
     def createBalloons(self):
         #TODO make it automatically generate based on some user input
         balloons = []
-        for i in range(30):
+        for i in range(15):
             balloons.append(Balloon.Balloon())
+            balloons.append(Balloon.Balloon())
+            balloons.append(Balloon.FastBalloon())
         return balloons
 
     def moveBalloonOn(self, board):

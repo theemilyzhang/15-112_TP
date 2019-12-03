@@ -48,3 +48,40 @@ class SuperTower(Tower): #faster cooldown, shoots by predicting balloon position
         super().__init__(location)
         self.defaultCoolDown = 10
         self.currentCoolDown = self.defaultCoolDown - 1
+
+    #TODO shoot by predicting balloon position
+
+class QuadTower(Tower):
+    price = 20
+    def __init__(self, location):
+        super().__init__(location)
+
+    def create4Bullets(self, location):
+        bullets = []
+        #up: dx = 0, dy = -1
+        bullets.append(Bullet.Bullet(location, 0, -1))
+        #down: dx = 0, dy = 1
+        bullets.append(Bullet.Bullet(location, 0, 1))
+        #right: dx = 1, dy = 0
+        bullets.append(Bullet.Bullet(location, 1, 0))
+        #left: dx = -1, dy = 0
+        bullets.append(Bullet.Bullet(location, -1, 0))
+
+        return bullets
+
+class FreezeTower(Tower):
+    price = 20
+    towerRange = 200
+    def __init__(self, location):
+        super().__init__(location):
+
+
+
+
+
+
+
+
+
+
+

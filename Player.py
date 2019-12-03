@@ -10,6 +10,8 @@ class Player(object):
         self.bullets = []
         self.isPlacingTower = False
         self.isPlacingSuperTower = False
+        self.isPlacingQuadTower = False
+        self.isPlacingFreezeTower = False
         self.illegallyPlacedTower = False
 
         self.offBalloons = self.createBalloons()
@@ -18,13 +20,15 @@ class Player(object):
     def createBalloons(self):
         #TODO make it automatically generate based on level mode
         balloons = []
+
         """
         for i in range(15):
             balloons.append(Balloon.Balloon())
             balloons.append(Balloon.Balloon())
             balloons.append(Balloon.FastBalloon())
         """
-        balloons.append(Balloon.ToughBalloon())
+        balloons.append(Balloon.FreezeBalloon)
+        balloons.append(Balloon.QuadBalloon())
         return balloons
 
     def moveBalloonOn(self, board):

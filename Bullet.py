@@ -10,6 +10,7 @@ class Bullet(object):
         self.radius = 2
         self.distanceTraveled = 0
         self.bulletRange = 200
+        self.isFreeze = False
 
 
     def checkCollision(self, onBalloons):

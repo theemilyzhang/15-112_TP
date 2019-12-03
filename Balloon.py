@@ -12,6 +12,7 @@ class Balloon(object):
         self.radius = 10
         self.coins = 1
         self.angleIncrement = math.pi/16
+        self.isFrozen = False
 
     def getDirection(self, towers, endX, endY):
         bx = self.position[0]

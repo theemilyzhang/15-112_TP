@@ -100,6 +100,8 @@ def runGame():
             #2: turn disappearingBalloons on/off
             #3: change color for toughBalloon if hp
             for balloon in mode.player.onBalloons:
+                if balloon.isFrozen:
+                    continue
                 #1
                 direction = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
                 dx, dy = math.cos(direction), -math.sin(direction) #unit vectors
@@ -123,10 +125,17 @@ def runGame():
 
             for tower in mode.player.towers:
                 if tower.currentCoolDown == 0:
-                    #add bullet to start of list with position at tower position (if shooting)
-                    newBullet = tower.createBulletIfInRange(mode.player.onBalloons)
-                    if newBullet != None:
-                        mode.player.bullets.append(newBullet)
+                    if isinstance(tower, Tower.QuadTower):
+                        #create bullets in 4 directions
+                        newBullets = tower.create4Bullets(tower.location)
+                        mode.player.bullets.extend(newBullets)
+                    else:
+                        #add bullet to start of list with position at tower position (if shooting)
+                        newBullet = tower.createBulletIfInRange(mode.player.onBalloons)
+                        if newBullet != None:
+                            if isinstance(tower, Tower.FreezeTower):
+                                newBullet.isFreeze = True
+                            mode.player.bullets.append(newBullet)
                     tower.currentCoolDown = tower.defaultCoolDown - 1
                 else:
                     tower.currentCoolDown -= 1
@@ -183,15 +192,41 @@ def runGame():
                 else:
                     mode.player.illegallyPlacedTower = True
 
+            elif mode.player.isPlacingQuadTower:
+                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedTower = False
+                    newTower = Tower.QuadTower((event.x, event.y))
+                    mode.player.towers.append(newTower)
+                    mode.player.coins -= Tower.QuadTower.price
+                    mode.player.isPlacingQuadTower = False
+                else:
+                    mode.player.illegallyPlacedTower = True
+
+            elif mode.player.isPlacingFreezeTower:
+                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedTower = False
+                    newTower = Tower.FreezeTower((event.x, event.y))
+                    mode.player.towers.append(newTower)
+                    mode.player.coins -= Tower.FreezeTower.price
+                    mode.player.isPlacingFreezeTower = False
+                else:
+                    mode.player.illegallyPlacedTower = True
 
 
         def keyPressed(mode, event):
             if (event.key == "t"):
                 if mode.player.coins >= Tower.Tower.price:
                     mode.player.isPlacingTower = True
-            if (event.key == "T"):
+            elif (event.key == "s"):
                 if mode.player.coins >= Tower.SuperTower.price:
                     mode.player.isPlacingSuperTower = True
+            elif (event.key == "q"):
+                if mode.player.coins >= Tower.QuadTower.price:
+                    mode.player.isPlacingQuadTower = True
+            elif (event.key == "f"):
+                if mode.player.coins >= Tower.FreezeTower.price:
+                    mode.player.isPlacingFreezeTower = True
+
 
 
         def redrawAll(mode, canvas):
@@ -240,7 +275,10 @@ def runGame():
                 cx, cy = balloon.position[0], balloon.position[1]
                 r = balloon.radius
 
-                canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill=balloon.color, width=0)
+                if balloon.isFrozen:
+                    canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="white", width=0)
+                else:
+                    canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill=balloon.color, width=0)
 
         def drawTowers(mode, canvas):
             for tower in mode.player.towers:

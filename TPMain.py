@@ -78,7 +78,7 @@ def runGame():
             mode.clock += 1
 
             ############################################################################################################
-            #BALLOONS
+            # BALLOONS
             ############################################################################################################
 
             if (mode.clock % 10 == 0):
@@ -96,26 +96,29 @@ def runGame():
                 else:
                     balIndex += 1
 
-            #move balloons by ideal direction
+            #1: move balloons by ideal direction
+            #2: turn disappearingBalloons on/off
+            #3: change color for toughBalloon if hp
             for balloon in mode.player.onBalloons:
+                #1
                 direction = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
                 dx, dy = math.cos(direction), -math.sin(direction) #unit vectors
                 balloon.position = (balloon.position[0] + dx*balloon.speed, balloon.position[1] + dy*balloon.speed)
                 balloon.distanceTraveled += balloon.speed
-
-            #turn disappearingBalloons on/off
-            for balloon in mode.player.onBalloons:
+                #2
                 if isinstance(balloon, Balloon.DisappearingBalloon):
                     balloon.timeSinceCreation += 1
-                    if 20 <= (balloon.timeSinceCreation % 30) <= 29:
+                    if 20 <= (balloon.timeSinceCreation % 30) < 30:
                         balloon.isVisible = False
                     else:
                         balloon.isVisible = True
-
-
+                #3
+                elif isinstance(balloon, Balloon.ToughBalloon):
+                    if balloon.hp == 1:
+                        balloon.color = "red"
 
             ############################################################################################################
-            #TOWERS
+            # TOWERS
             ############################################################################################################
 
             for tower in mode.player.towers:
@@ -129,7 +132,7 @@ def runGame():
                     tower.currentCoolDown -= 1
 
             ############################################################################################################
-            #BULLETS
+            # BULLETS
             ############################################################################################################
 
             bulIndex = 0
@@ -221,6 +224,8 @@ def runGame():
 
         def drawBalloons(mode, canvas):
             for balloon in mode.player.onBalloons:
+                if isinstance(balloon, Balloon.DisappearingBalloon) and not balloon.isVisible:
+                    continue
                 cx, cy = balloon.position[0], balloon.position[1]
                 r = balloon.radius
 
@@ -241,27 +246,10 @@ def runGame():
                 r = bullet.radius
                 canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="black")
 
-    class TwoPlayerMode(Mode):
-        def appStarted(mode):
-            pass
-
-        def timerFired(mode):
-            pass
-
-        def mousePressed(mode, event):
-            pass
-
-        def keyPressed(mode, event):
-            pass
-
-        def redrawAll(mode, canvas):
-            pass
-
     class MyModalApp(ModalApp):
         def appStarted(app):
             app.splashScreenMode = SplashScreenMode()
             app.onePlayerMode = OnePlayerMode()
-            app.twoPlayerMode = TwoPlayerMode()
             app.setActiveMode(app.splashScreenMode)
 
 

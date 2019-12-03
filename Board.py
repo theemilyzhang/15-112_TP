@@ -18,8 +18,3 @@ class Board(object):
         dy = deltaY/distance
         return dx, dy
 
-    def canPlaceTowerHere(self, x, y, tower):
-        tower.halfHeight, tower.halfWidth
-        #if self.towersOverlap(x, y)
-        #TODO complete this lol
-        pass

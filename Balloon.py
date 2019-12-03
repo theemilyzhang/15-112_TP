@@ -14,9 +14,6 @@ class Balloon(object):
         self.angleIncrement = math.pi/16
 
     def getDirection(self, towers, endX, endY):
-        print("in getDirection")
-        print("balloon: " + str(self.position[0]) + " " + str(self.position[1]))
-        print("end: " + str(endX) + " " + str(endY))
         bx = self.position[0]
         by = self.position[1]
         defaultAngle = getAngle(bx, by, endX, endY)
@@ -25,7 +22,6 @@ class Balloon(object):
         for tower in towers:
             tx = tower.location[0]
             ty = tower.location[1]
-            print("tower:" + str(tx) + " " + str(ty))
             hypotenuse1 = getDistance(bx, by, tx, ty) #distance between centers, always positive
             oppositeSide1 = tower.radius
             dTheta1 = math.asin(oppositeSide1/hypotenuse1) #positive, 0 to pi
@@ -50,7 +46,6 @@ class Balloon(object):
                 restriction = (restriction[0], restriction[1] - 2*math.pi)
             self.updateBRange(brange, restriction)
 
-        print(brange)
         return self.getBestDirection(defaultAngle, brange)
 
     def updateBRange(self, brange, restriction):
@@ -141,12 +136,10 @@ class Balloon(object):
     def getBestDirection(self, defaultAngle, brange):
         #if brange == [], all directions possible, so auto return default
         if brange == []:
-            print(defaultAngle / math.pi * 180)
             return defaultAngle
         #if defaultAngle is legal, return that
         for tuple in brange:
             if tuple[0] <= defaultAngle <= tuple[1]:
-                print(defaultAngle / math.pi * 180)
                 return defaultAngle
         #otherwise, check for the closest legal angle to defaultAngle
         bestAngle = brange[0][0] #every possible angle will be better than this
@@ -155,7 +148,6 @@ class Balloon(object):
                 bestAngle = tuple[0]
             if getDifferenceBetweenTwoAngles(tuple[1], defaultAngle) < getDifferenceBetweenTwoAngles(bestAngle, defaultAngle):
                 bestAngle = tuple[1]
-        print(bestAngle / math.pi * 180)
         return bestAngle
 
     def checkCollision(self, towers, dx, dy):

@@ -63,7 +63,7 @@ def runGame():
                                text="2 Player", font="Arial 35")
 
 
-    class OnePlayerMode(Mode):
+    class EasyMode(Mode):
         def appStarted(mode):
             mode.player = Player.Player()
             mode.board = Board.Board(mode.width, mode.height)
@@ -162,17 +162,26 @@ def runGame():
         def mousePressed(mode, event):
             #if in placing tower mode, create tower where player clicked (if position is valid),
             #decrease player's coins, and turn mode off
+            towerRadius = Tower.Tower((0, 0)).radius #pointless tower created just to access its radius
             if mode.player.isPlacingTower:
-                newTower = Tower.Tower((event.x, event.y))
-                mode.player.towers.append(newTower)
-                mode.player.coins -= Tower.Tower.price
-                mode.player.isPlacingTower = False
+                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedTower = False
+                    newTower = Tower.Tower((event.x, event.y))
+                    mode.player.towers.append(newTower)
+                    mode.player.coins -= Tower.Tower.price
+                    mode.player.isPlacingTower = False
+                else:
+                    mode.player.illegallyPlacedTower = True
 
             elif mode.player.isPlacingSuperTower:
-                newTower = Tower.SuperTower((event.x, event.y))
-                mode.player.towers.append(newTower)
-                mode.player.coins -= Tower.SuperTower.price
-                mode.player.isPlacingSuperTower = False
+                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedTower = False
+                    newTower = Tower.SuperTower((event.x, event.y))
+                    mode.player.towers.append(newTower)
+                    mode.player.coins -= Tower.SuperTower.price
+                    mode.player.isPlacingSuperTower = False
+                else:
+                    mode.player.illegallyPlacedTower = True
 
 
 
@@ -204,10 +213,13 @@ def runGame():
 
         def drawInstructions(mode, canvas):
             #placing towers
-            if mode.player.isPlacingTower:
+            if mode.player.illegallyPlacedTower:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place the tower there. Try again.", font="Arial 30 bold")
+            elif mode.player.isPlacingTower:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Arial 30 bold")
-            if mode.player.isPlacingSuperTower:
+            elif mode.player.isPlacingSuperTower:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the super tower placed.", font="Arial 30 bold")
+
 
         def drawTopBanner(mode, canvas):
             width = mode.app.width
@@ -217,7 +229,6 @@ def runGame():
             canvas.create_text(width - 40, mode.board.topMargin//2, text=f"Coins: {mode.player.coins}")
             canvas.create_text(width - 100, mode.board.topMargin//2, text=f"HP: {mode.player.hp}")
             canvas.create_text(100, mode.board.topMargin//2, text="B11oons 2ower Defense")
-            #TODO change text to logo ^
 
         def drawBoard(mode, canvas):
             canvas.create_image(mode.app.width//2, mode.app.height//2, image=ImageTk.PhotoImage(mode.backgroundImage))
@@ -249,7 +260,7 @@ def runGame():
     class MyModalApp(ModalApp):
         def appStarted(app):
             app.splashScreenMode = SplashScreenMode()
-            app.onePlayerMode = OnePlayerMode()
+            app.easyMode = EasyMode()
             app.setActiveMode(app.splashScreenMode)
 
 

@@ -1,4 +1,5 @@
 from mathFunctions import *
+import Balloon
 
 class Tower(object):
     price = 20
@@ -14,6 +15,8 @@ class Tower(object):
         #find balloon with max dist traveled that's also in range
         furthestBalloon = None
         for balloon in onBalloons:
+            if isinstance(balloon, Balloon.DisappearingBalloon) and not balloon.isVisible:
+                continue
             bx = balloon.position[0]
             by = balloon.position[1]
             tx = self.location[0]
@@ -99,7 +102,3 @@ class Bullet(object):
             return True
 
         return False
-
-
-
-

@@ -7,7 +7,7 @@ class Balloon(object):
         self.speed = speed
         self.hp = hp
         self.color = color
-        self.position = (-1, -1) #in pixels, aka starts off-screen
+        self.position = (0, 0) #in pixels, aka starts top-left
         self.distanceTraveled = 0
         self.radius = 10
         self.coins = 1
@@ -52,7 +52,6 @@ class Balloon(object):
 
         print(brange)
         return self.getBestDirection(defaultAngle, brange)
-
 
     def updateBRange(self, brange, restriction):
         if brange == []:
@@ -211,3 +210,17 @@ class FastBalloon(Balloon):
         self.color = "blue"
         self.speed = 10
 
+class DisappearingBalloon(Balloon):
+    def __init__(self):
+        super().__init__()
+        self.color = "purple"
+        self.isVisible = True
+        self.timeSinceCreation = 0
+
+class ToughBalloon(Balloon):
+    def __init__(self):
+        super().__init__()
+        self.color = "pink"
+        self.hp = 2
+
+    #TODO: add method that makes it change color if hp = 1

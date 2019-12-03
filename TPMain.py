@@ -5,6 +5,7 @@ import Player
 import Tower
 import Board
 import math
+import Balloon
 
 #animation and graphics framework from http://www.cs.cmu.edu/~112/notes/notes-animations-part1.html
 #modal app from http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
@@ -76,13 +77,16 @@ def runGame():
         def timerFired(mode):
             mode.clock += 1
 
+            ############################################################################################################
             #BALLOONS
+            ############################################################################################################
+
             if (mode.clock % 10 == 0):
                 #a new balloon appears on screen (move a balloon from offBalloons to onBalloons)
                 if (len(mode.player.offBalloons) != 0):
                     mode.player.moveBalloonOn(mode.board)
 
-            #if balloon is off board (x value > width of board), decrement player HP and remove it from onBalloon list
+            #if balloon is off board (x value > width of board), remove it from onBalloon list and decrement player HP
             balIndex = 0
             while (balIndex < len(mode.player.onBalloons)):
                 balloon = mode.player.onBalloons[balIndex]
@@ -92,14 +96,28 @@ def runGame():
                 else:
                     balIndex += 1
 
+            #move balloons by ideal direction
             for balloon in mode.player.onBalloons:
                 direction = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
                 dx, dy = math.cos(direction), -math.sin(direction) #unit vectors
                 balloon.position = (balloon.position[0] + dx*balloon.speed, balloon.position[1] + dy*balloon.speed)
                 balloon.distanceTraveled += balloon.speed
 
+            #turn disappearingBalloons on/off
+            for balloon in mode.player.onBalloons:
+                if isinstance(balloon, Balloon.DisappearingBalloon):
+                    balloon.timeSinceCreation += 1
+                    if 20 <= (balloon.timeSinceCreation % 30) <= 29:
+                        balloon.isVisible = False
+                    else:
+                        balloon.isVisible = True
 
+
+
+            ############################################################################################################
             #TOWERS
+            ############################################################################################################
+
             for tower in mode.player.towers:
                 if tower.currentCoolDown == 0:
                     #add bullet to start of list with position at tower position (if shooting)
@@ -110,8 +128,10 @@ def runGame():
                 else:
                     tower.currentCoolDown -= 1
 
-
+            ############################################################################################################
             #BULLETS
+            ############################################################################################################
+
             bulIndex = 0
             while (bulIndex < len(mode.player.bullets)):
                 bullet = mode.player.bullets[bulIndex]
@@ -248,5 +268,3 @@ def runGame():
     app = MyModalApp(width=1200, height=720)
 
 runGame()
-
-

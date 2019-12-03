@@ -1,5 +1,4 @@
 import Balloon
-import Board
 import Tower
 
 class Player(object):
@@ -14,16 +13,19 @@ class Player(object):
         self.offBalloons = self.createBalloons()
         self.onBalloons = []
 
-
-
     def createBalloons(self):
-        #TODO make it automatically generate based on some user input
+        #TODO make it automatically generate based on level mode
         balloons = []
+        """
         for i in range(15):
             balloons.append(Balloon.Balloon())
             balloons.append(Balloon.Balloon())
             balloons.append(Balloon.FastBalloon())
+        """
+        balloons.append(Balloon.DisappearingBalloon)
         return balloons
+
+
 
     def moveBalloonOn(self, board):
         #moves a balloon from offBalloons to onBalloons and changes its position to the start of the path
@@ -35,6 +37,3 @@ class Player(object):
     def addTower(self, x, y):
         newTower = Tower.Tower((x, y))
         self.towers.append(newTower)
-
-
-

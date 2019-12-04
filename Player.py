@@ -4,7 +4,7 @@ from mathFunctions import *
 
 class Player(object):
     def __init__(self):
-        self.hp = 50
+        self.hp = 2
         self.coins = 200
         self.towers = []
         self.bullets = []
@@ -17,8 +17,8 @@ class Player(object):
     def createBalloons(self):
         #TODO make it automatically generate based on level mode
         balloons = []
-        # for i in range(5):
-        #     balloons.append(Balloon.PinkBalloon())
+        for i in range(5):
+            balloons.append(Balloon.PinkBalloon())
         # for i in range(5):
         #     balloons.append(Balloon.YellowBalloon())
         # for i in range(5):
@@ -27,7 +27,7 @@ class Player(object):
         #     balloons.append(Balloon.BlueBalloon())
         # for i in range(5):
         #     balloons.append(Balloon.Balloon())
-        balloons.append(Balloon.Blimp())
+        # balloons.append(Balloon.Blimp())
         return balloons
 
     def moveBalloonOn(self, board):
@@ -53,9 +53,9 @@ class Player(object):
                 return False
 
         #2
-        if getDistance(0, 0, x, y) < 3*towerRadius:
+        if getDistance(0, 0, x, y) < 4*towerRadius:
             return False
-        elif getDistance(x, y, width, height) < 3*towerRadius:
+        elif getDistance(x, y, width, height) < 4*towerRadius:
             return False
 
         #3

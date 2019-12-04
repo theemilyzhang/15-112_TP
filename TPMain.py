@@ -79,7 +79,6 @@ def runGame():
             mode.freezetowerImage = mode.scaleImage(freezetowerImageUnscaled, 1/15)
 
             mode.backgroundImage = mode.loadImage("sky.jpg")
-            #mode.timerDelay = 17 #TODO is this how i can make it faster bc its not working
 
 
         def timerFired(mode):
@@ -163,6 +162,13 @@ def runGame():
                 else:
                     bulIndex += 1
 
+            ############################################################################################################
+            # GAME OVER
+            ############################################################################################################
+            if (mode.player.hp <= 0) or (len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0):
+                mode.app.paused = True
+
+
 
         def mousePressed(mode, event):
             #if in placing tower mode, create tower where player clicked (if position is valid),
@@ -199,31 +205,40 @@ def runGame():
                     mode.player.placingTower = Tower.FreezeTower((0, 0))
 
 
-
         def redrawAll(mode, canvas):
             mode.drawBoard(canvas) #includes bg image
-            mode.drawTopBanner(canvas)
             mode.drawBalloons(canvas)
             mode.drawTowers(canvas)
             mode.drawBullets(canvas)
+            mode.drawTopBanner(canvas)
             mode.drawInstructions(canvas)
             if mode.player.placingTower is not None:
                 mode.drawNewTowerOutline(canvas)
 
             if len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0:
-                #TODO draw win screen (mode)
-                pass
+                mode.drawWinScreen(canvas)
             if mode.player.hp <= 0:
-                #TODO draw lose screen (mode)
-                pass
+                mode.drawLoseScreen(canvas)
+
+        def drawWinScreen(mode, canvas):
+            cx = mode.app.width//2
+            cy = mode.app.height//2
+            canvas.create_rectangle(cx-200, cy-200, cx+200, cy+200, fill="white")
+            canvas.create_text(cx, cy, text="Congrats! You won!", font="raleway 30 bold")
+
+        def drawLoseScreen(mode, canvas):
+            cx = mode.app.width//2
+            cy = mode.app.height//2
+            canvas.create_rectangle(cx-200, cy-200, cx+200, cy+200, fill="white")
+            canvas.create_text(cx, cy, text="Oh no! You lost.", font="raleway 30 bold")
 
 
         def drawInstructions(mode, canvas):
             #placing towers
             if mode.player.illegallyPlacedTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place the tower there. Try again.", font="Raleway 30 bold")
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place the tower there. Try again.", font="raleway 30 bold")
             elif mode.player.placingTower != None:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the " + mode.player.placingTower.name + " placed.", font="Raleway 30 bold")
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the " + mode.player.placingTower.name + " placed.", font="raleway 30 bold")
 
         def drawNewTowerOutline(mode, canvas):
             x = mode.player.placingTower.location[0]
@@ -242,6 +257,12 @@ def runGame():
 
         def drawBoard(mode, canvas):
             canvas.create_image(mode.app.width//2, mode.app.height//2, image=ImageTk.PhotoImage(mode.backgroundImage))
+            towerRadius = Tower.Tower((0,0)).radius #pointless location, just to get radius
+            r = 4 * towerRadius
+            canvas.create_oval(-r, -r, r, r, fill="white", width=0)
+            canvas.create_text(towerRadius+20, towerRadius+15, text="Entrance", font="Raleway 20")
+            canvas.create_oval(mode.app.width-r, mode.app.height-r, mode.app.width+r, mode.app.height+r, fill="white", width=0)
+            canvas.create_text(mode.app.width - towerRadius - 5, mode.app.height - towerRadius - 5, text="Exit", font="Raleway 20")
 
         def drawBalloons(mode, canvas):
             for balloon in mode.player.onBalloons:
@@ -277,6 +298,7 @@ def runGame():
                 cy = bullet.location[1]
                 r = bullet.radius
                 canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="black")
+
 
     class MyModalApp(ModalApp):
         def appStarted(app):

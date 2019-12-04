@@ -4,7 +4,6 @@ from tkinter import *
 import Player
 import Tower
 import Board
-import math
 import Balloon
 import Cactus
 from mathFunctions import *
@@ -13,6 +12,7 @@ from mathFunctions import *
 #modal app from http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
 #tower image from https://www.pngguru.com/free-transparent-background-png-clipart-lbpet/download
 #sky image from http://www.alpharoofinginc.com/roofing-sky-background-3-2-jpg/
+#cactus image from https://www.pexels.com/photo/three-potted-cactus-plants-1903965/
 
 def runGame():
 
@@ -196,7 +196,7 @@ def runGame():
             # GAME OVER
             ############################################################################################################
             if (mode.player.hp <= 0) or (len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0):
-                mode.app.paused = True
+                mode.app._paused = True
 
 
         def mousePressed(mode, event):
@@ -264,10 +264,20 @@ def runGame():
             if mode.player.placingCactus != None:
                 mode.drawNewCactusOutline(canvas)
 
+            if mode.app._paused:
+                mode.drawHelp(canvas)
+
             if len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0:
                 mode.drawWinScreen(canvas)
             if mode.player.hp <= 0:
                 mode.drawLoseScreen(canvas)
+
+        def drawHelp(mode, canvas):
+            cx = mode.app.width//2
+            cy = mode.app.height//2
+            canvas.create_rectangle(cx-300, cy-300, cx+300, cy+300, fill="white")
+            canvas.create_text(cx, cy-275, text="Help Screen", font="raleway 30 bold")
+            #TODO add help instructions
 
         def drawCacti(mode, canvas):
             for cactus in mode.player.cacti:
@@ -366,6 +376,8 @@ def runGame():
     class HardMode(EasyMode):
         def appStarted(mode):
             super().appStarted()
+            mode.player.hp = 20
+            mode.player.offBalloons = mode.player.createBalloons("hard")
 
     class MyModalApp(ModalApp):
         def appStarted(app):

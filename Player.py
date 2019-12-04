@@ -16,20 +16,38 @@ class Player(object):
         self.offBalloons = self.createBalloons()
         self.onBalloons = []
 
-    def createBalloons(self):
-        #TODO make it automatically generate based on level mode
+    def createBalloons(self, difficulty="easy"):
         balloons = []
-        for i in range(5):
-            balloons.append(Balloon.PinkBalloon())
-        # for i in range(5):
-        #     balloons.append(Balloon.YellowBalloon())
-        # for i in range(5):
-        #     balloons.append(Balloon.GreenBalloon())
-        # for i in range(5):
-        #     balloons.append(Balloon.BlueBalloon())
-        # for i in range(5):
-        #     balloons.append(Balloon.Balloon())
-        # balloons.append(Balloon.Blimp())
+
+        #TODO make it automatically generate based on level mode
+
+        if difficulty == "easy":
+            balloons.append(Balloon.Blimp())
+            for i in range(5):
+                balloons.append(Balloon.PinkBalloon())
+            for i in range(5):
+                balloons.append(Balloon.YellowBalloon())
+            for i in range(5):
+                balloons.append(Balloon.GreenBalloon())
+            for i in range(5):
+                balloons.append(Balloon.BlueBalloon())
+            for i in range(5):
+                balloons.append(Balloon.Balloon())
+        else:
+            balloons.append(Balloon.Blimp())
+            for i in range(5):
+                balloons.append(Balloon.PinkBalloon())
+            for i in range(5):
+                balloons.append(Balloon.YellowBalloon())
+            for i in range(5):
+                balloons.append(Balloon.GreenBalloon())
+            for i in range(5):
+                balloons.append(Balloon.BlueBalloon())
+            for i in range(5):
+                balloons.append(Balloon.Balloon())
+            pass
+
+
         return balloons
 
     def moveBalloonOn(self, board):

@@ -1,23 +1,23 @@
 from mathFunctions import *
+import Balloon
+import Bullet
 
 class Tower(object):
     price = 20
     towerRange = 200
     def __init__(self, location):
         self.location = location #tuple
-        self.halfHeight = 30
-        self.halfWidth = 10
+        self.radius = 30
+        #TODO check if ^ is accurate
         self.defaultCoolDown = 20
         self.currentCoolDown = self.defaultCoolDown - 1
-
-        #TODO check if ^ is accurate
-
-
 
     def createBulletIfInRange(self, onBalloons):
         #find balloon with max dist traveled that's also in range
         furthestBalloon = None
         for balloon in onBalloons:
+            if isinstance(balloon, Balloon.DisappearingBalloon) and not balloon.isVisible:
+                continue
             bx = balloon.position[0]
             by = balloon.position[1]
             tx = self.location[0]
@@ -36,65 +36,51 @@ class Tower(object):
             scaleFactor = (deltaX**2 + deltaY**2)**.5
             dx = deltaX/scaleFactor
             dy = deltaY/scaleFactor
-            return Bullet(self.location, dx, dy)
+            return Bullet.Bullet(self.location, dx, dy)
             #return bullet with location of tower and dx dy according to balloon it's shooting at
 
         return None
 
-class Bullet(object):
+class SuperTower(Tower): #faster cooldown, shoots by predicting balloon position
+    price = 40
+    towerRange = 200
+    def __init__(self, location):
+        super().__init__(location)
+        self.defaultCoolDown = 10
+        self.currentCoolDown = self.defaultCoolDown - 1
 
-    def __init__(self, location, dx, dy):
-        self.location = location
-        self.dx = dx
-        self.dy = dy
-        self.speed = 50
-        self.radius = 2
-        self.distanceTraveled = 0
-        self.bulletRange = 200
+    #TODO shoot by predicting balloon position
+
+class QuadTower(Tower):
+    price = 20
+    def __init__(self, location):
+        super().__init__(location)
+
+    def create4Bullets(self, location):
+        bullets = []
+        #up: dx = 0, dy = -1
+        bullets.append(Bullet.Bullet(location, 0, -1))
+        #down: dx = 0, dy = 1
+        bullets.append(Bullet.Bullet(location, 0, 1))
+        #right: dx = 1, dy = 0
+        bullets.append(Bullet.Bullet(location, 1, 0))
+        #left: dx = -1, dy = 0
+        bullets.append(Bullet.Bullet(location, -1, 0))
+
+        return bullets
+
+class FreezeTower(Tower):
+    price = 20
+    towerRange = 200
+    def __init__(self, location):
+        super().__init__(location)
 
 
-    def checkCollision(self, onBalloons):
-        #note: bullet is at new location (already been moved)
-        for balloon in onBalloons:
-            if self.collidedWithBalloon(balloon):
-                #decrement balloon hp, then remove if dead
-                balloon.hp -= 1
-                if balloon.hp <= 0:
-                    onBalloons.remove(balloon)
-                return True
-        return False
 
-    def collidedWithBalloon(self, balloon):
-        bulx1 = self.location[0]
-        buly1 = self.location[1]
-        bulx0 = bulx1 - (self.dx * self.speed)
-        buly0 = buly1 - (self.dy * self.speed)
-        bulr = self.radius
-        bulSlope = -self.dy/self.dx
 
-        balx = balloon.position[0]
-        baly = balloon.position[1]
-        balr = balloon.radius
 
-        bothr = bulr + balr
 
-        #if balloon is in terminal circle
-        balBulCenterDistCircle = getDistance(balx, baly, bulx1, buly1)
-        if balBulCenterDistCircle <= bothr:
-            return True
 
-        #if balloon is in rectangle
-        perpSlope = -1 * (1/bulSlope)
-        intersectX = solveIntersectX(bulSlope, bulx1, buly1, perpSlope, balx, baly)
-        intersectY = bulSlope * (intersectX - bulx0) + buly0
-        balBulCenterDistRectangle = getDistance(balx, baly, intersectX, intersectY)
-
-        if (min(bulx0, bulx1) <= intersectX <= max(bulx0, bulx1) and
-            min(buly0, buly1) <= intersectY <= max(buly0, buly1) and
-            balBulCenterDistRectangle <= bothr):
-            return True
-
-        return False
 
 
 

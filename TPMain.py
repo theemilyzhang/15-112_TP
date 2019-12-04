@@ -3,8 +3,9 @@ from cmu_112_graphics import *
 from tkinter import *
 import Player
 import Tower
-import Balloon
 import Board
+import math
+import Balloon
 
 #animation and graphics framework from http://www.cs.cmu.edu/~112/notes/notes-animations-part1.html
 #modal app from http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
@@ -12,6 +13,7 @@ import Board
 #sky image from http://www.alpharoofinginc.com/roofing-sky-background-3-2-jpg/
 
 def runGame():
+
     class SplashScreenMode(Mode):
         def appStarted(mode):
             mode.backgroundImage = mode.loadImage("sky.jpg")
@@ -25,50 +27,57 @@ def runGame():
             # 1 player button
             if (width*1//10 <= x <= width*3//10 and
                 height*3//4 <= y <= height*7//8):
-                mode.app.setActiveMode(mode.app.onePlayerMode)
+                mode.app.setActiveMode(mode.app.easyMode)
 
             #2 player button
             if (width*7//10 <= x <= width*9//10 and
                 height*3//4 <= y <= height*7//8):
-                mode.app.setActiveMode(mode.app.twoPlayerMode)
+                mode.app.setActiveMode(mode.app.hardMode)
 
 
         def redrawAll(mode, canvas):
             width = mode.app.width
             height = mode.app.height
-            #todo: draw background
             canvas.create_image(mode.app.width//2, mode.app.height//2, image=ImageTk.PhotoImage(mode.backgroundImage))
 
             #draw logo
-            #todo: add image later
             canvas.create_text(width//2, height//2,
-                               text="Bloons Tower Defense", font="Arial 50")
+                               text="Bloons Tower Defense", font="Raleway 50")
 
             #draw buttons
             canvas.create_rectangle(width*1//10, height*3//4,
                                     width*3//10, height*7//8,
                                     fill="light blue")
             canvas.create_text(width*2//10, height*13//16,
-                               text="1 Player", font="Arial 35")
+                               text="Easy Mode", font="Raleway 35")
             canvas.create_rectangle(width*4//10, height*3//4,
                                     width*6//10, height*7//8,
                                     fill="light blue")
             canvas.create_text(width*5//10, height*13//16,
-                               text="Versus AI", font="Arial 35")
+                               text="Medium Mode", font="Raleway 35")
             canvas.create_rectangle(width*7//10, height*3//4,
                                     width*9//10, height*7//8,
                                     fill="light blue")
             canvas.create_text(width*8//10, height*13//16,
-                               text="2 Player", font="Arial 35")
+                               text="Hard Mode", font="Raleway 35")
 
 
-    class OnePlayerMode(Mode):
+    class EasyMode(Mode):
         def appStarted(mode):
             mode.player = Player.Player()
             mode.board = Board.Board(mode.width, mode.height)
             mode.clock = 0
+
+            #images
             towerImageUnscaled = mode.loadImage("tower.png")
             mode.towerImage = mode.scaleImage(towerImageUnscaled, 1/15)
+            supertowerImageUnscaled = mode.loadImage("supertower.png")
+            mode.supertowerImage = mode.scaleImage(supertowerImageUnscaled, 1/15)
+            quadtowerImageUnscaled = mode.loadImage("quadtower.png")
+            mode.quadtowerImage = mode.scaleImage(quadtowerImageUnscaled, 1/15)
+            freezetowerImageUnscaled = mode.loadImage("freezetower.png")
+            mode.freezetowerImage = mode.scaleImage(freezetowerImageUnscaled, 1/15)
+
             mode.backgroundImage = mode.loadImage("sky.jpg")
             #mode.timerDelay = 17 #TODO is this how i can make it faster bc its not working
 
@@ -76,13 +85,16 @@ def runGame():
         def timerFired(mode):
             mode.clock += 1
 
-            #BALLOONS
+            ############################################################################################################
+            # BALLOONS
+            ############################################################################################################
+
             if (mode.clock % 10 == 0):
                 #a new balloon appears on screen (move a balloon from offBalloons to onBalloons)
                 if (len(mode.player.offBalloons) != 0):
                     mode.player.moveBalloonOn(mode.board)
 
-            #if balloon is off board (x value > width of board), decrement player HP and remove it from onBalloon list
+            #if balloon is off board (x value > width of board), remove it from onBalloon list and decrement player HP
             balIndex = 0
             while (balIndex < len(mode.player.onBalloons)):
                 balloon = mode.player.onBalloons[balIndex]
@@ -92,70 +104,54 @@ def runGame():
                 else:
                     balIndex += 1
 
-            balIndex = 0
-            while(balIndex < len(mode.player.onBalloons)):
-                balloon = mode.player.onBalloons[balIndex]
-                curX = balloon.position[0]
-                curY = balloon.position[1]
-
-                #see if direct path to end works
-                #1: find direct dx/dy
-                dxDirect, dyDirect = mode.board.getDirectDxDy(curX, curY)
-                #2: move balloon by that dx/dy
-                oldX = balloon.position[0]
-                oldY = balloon.position[1]
-                newX = oldX + (dxDirect * balloon.speed)
-                newY = oldY + (dyDirect * balloon.speed)
-                balloon.location = (newX, newY)
-                balloon.distanceTraveled += balloon.speed
-                #3: check for collision w tower radius
-                if balloon.checkCollision(mode.player.towers, dxDirect, dyDirect):
-                    #if direct path doesn't work, undo movement and try other angles
-                    balloon.location = (oldX, oldY)
-                    balloon.distanceTraveled -= balloon.speed
-                    dx, dy = balloon.getWorkingDirection(mode.player.towers, dxDirect, dyDirect) #TODO write this
-                    newX = oldX + (dx * balloon.speed)
-                    newY = oldY + (dy * balloon.speed)
-                    balloon.location = (newX, newY)
-                    balloon.distanceTraveled += balloon.speed
-
-                #if balloon exited board, decrement player HP by balloon's remaining HP
-                if newX >= mode.app.width or newY >= mode.app.height:
-                    mode.player.hp -= balloon.hp
-
-
-            """
-            #move every balloon on the board by speed * (dx, dy)
+            #1: move balloons by ideal direction
+            #2: turn disappearingBalloons on/off
+            #3: change color for toughBalloon if hp
             for balloon in mode.player.onBalloons:
-                curX = balloon.position[0]
-                curY = balloon.position[1]
-                #find row, col that balloon is currently in
-                curRow, curCol = mode.board.getCell(curX, curY)
-                if (0 <= curRow <= mode.board.size and 0 <= curCol <= mode.board.size):
-                    #find corresponding dx, dy for given row, col
-                    dx, dy = mode.board.grid[curRow][curCol]
-                    #assign new position to balloon
-                    xTraveled = balloon.speed * dx
-                    yTraveled = balloon.speed * dy
-                    newX = curX + xTraveled
-                    newY = curY + yTraveled
-                    balloon.distanceTraveled += (xTraveled + yTraveled)
-                    balloon.position = (newX, newY)
-            """
+                if balloon.isFrozen:
+                    continue
+                #1
+                direction = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
+                dx, dy = math.cos(direction), -math.sin(direction) #unit vectors
+                balloon.position = (balloon.position[0] + dx*balloon.speed, balloon.position[1] + dy*balloon.speed)
+                balloon.distanceTraveled += balloon.speed
+                #2
+                if isinstance(balloon, Balloon.DisappearingBalloon):
+                    balloon.timeSinceCreation += 1
+                    if 20 <= (balloon.timeSinceCreation % 30) < 30:
+                        balloon.isVisible = False
+                    else:
+                        balloon.isVisible = True
+                #3
+                elif isinstance(balloon, Balloon.ToughBalloon):
+                    if balloon.hp == 1:
+                        balloon.color = "red"
 
-            #TOWERS
+            ############################################################################################################
+            # TOWERS
+            ############################################################################################################
+
             for tower in mode.player.towers:
                 if tower.currentCoolDown == 0:
-                    #add bullet to start of list with position at tower position (if shooting)
-                    newBullet = tower.createBulletIfInRange(mode.player.onBalloons)
-                    if newBullet != None:
-                        mode.player.bullets.append(newBullet)
+                    if isinstance(tower, Tower.QuadTower):
+                        #create bullets in 4 directions
+                        newBullets = tower.create4Bullets(tower.location)
+                        mode.player.bullets.extend(newBullets)
+                    else:
+                        #add bullet to start of list with position at tower position (if shooting)
+                        newBullet = tower.createBulletIfInRange(mode.player.onBalloons)
+                        if newBullet != None:
+                            if isinstance(tower, Tower.FreezeTower):
+                                newBullet.isFreeze = True
+                            mode.player.bullets.append(newBullet)
                     tower.currentCoolDown = tower.defaultCoolDown - 1
                 else:
                     tower.currentCoolDown -= 1
 
+            ############################################################################################################
+            # BULLETS
+            ############################################################################################################
 
-            #BULLETS
             bulIndex = 0
             while (bulIndex < len(mode.player.bullets)):
                 bullet = mode.player.bullets[bulIndex]
@@ -183,17 +179,62 @@ def runGame():
         def mousePressed(mode, event):
             #if in placing tower mode, create tower where player clicked (if position is valid),
             #decrease player's coins, and turn mode off
+            towerRadius = Tower.Tower((0, 0)).radius #pointless tower created just to access its radius
             if mode.player.isPlacingTower:
-                newTower = Tower.Tower((event.x, event.y))
-                mode.player.towers.append(newTower)
-                mode.player.coins -= Tower.Tower.price
-                mode.player.isPlacingTower = False
+                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedTower = False
+                    newTower = Tower.Tower((event.x, event.y))
+                    mode.player.towers.append(newTower)
+                    mode.player.coins -= Tower.Tower.price
+                    mode.player.isPlacingTower = False
+                else:
+                    mode.player.illegallyPlacedTower = True
+
+            elif mode.player.isPlacingSuperTower:
+                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedTower = False
+                    newTower = Tower.SuperTower((event.x, event.y))
+                    mode.player.towers.append(newTower)
+                    mode.player.coins -= Tower.SuperTower.price
+                    mode.player.isPlacingSuperTower = False
+                else:
+                    mode.player.illegallyPlacedTower = True
+
+            elif mode.player.isPlacingQuadTower:
+                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedTower = False
+                    newTower = Tower.QuadTower((event.x, event.y))
+                    mode.player.towers.append(newTower)
+                    mode.player.coins -= Tower.QuadTower.price
+                    mode.player.isPlacingQuadTower = False
+                else:
+                    mode.player.illegallyPlacedTower = True
+
+            elif mode.player.isPlacingFreezeTower:
+                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedTower = False
+                    newTower = Tower.FreezeTower((event.x, event.y))
+                    mode.player.towers.append(newTower)
+                    mode.player.coins -= Tower.FreezeTower.price
+                    mode.player.isPlacingFreezeTower = False
+                else:
+                    mode.player.illegallyPlacedTower = True
 
 
         def keyPressed(mode, event):
             if (event.key == "t"):
                 if mode.player.coins >= Tower.Tower.price:
                     mode.player.isPlacingTower = True
+            elif (event.key == "s"):
+                if mode.player.coins >= Tower.SuperTower.price:
+                    mode.player.isPlacingSuperTower = True
+            elif (event.key == "q"):
+                if mode.player.coins >= Tower.QuadTower.price:
+                    mode.player.isPlacingQuadTower = True
+            elif (event.key == "f"):
+                if mode.player.coins >= Tower.FreezeTower.price:
+                    mode.player.isPlacingFreezeTower = True
+
 
 
         def redrawAll(mode, canvas):
@@ -202,8 +243,6 @@ def runGame():
             mode.drawBalloons(canvas)
             mode.drawTowers(canvas)
             mode.drawBullets(canvas)
-
-            #TODO finish draw instructions (if in certain placing modes)
             mode.drawInstructions(canvas)
 
             if len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0:
@@ -216,8 +255,13 @@ def runGame():
 
         def drawInstructions(mode, canvas):
             #placing towers
-            if mode.player.isPlacingTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Arial 30 bold")
+            if mode.player.illegallyPlacedTower:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place the tower there. Try again.", font="Raleway 30 bold")
+            elif mode.player.isPlacingTower:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Raleway 30 bold")
+            elif mode.player.isPlacingSuperTower:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the super tower placed.", font="Raleway 30 bold")
+
 
         def drawTopBanner(mode, canvas):
             width = mode.app.width
@@ -227,64 +271,53 @@ def runGame():
             canvas.create_text(width - 40, mode.board.topMargin//2, text=f"Coins: {mode.player.coins}")
             canvas.create_text(width - 100, mode.board.topMargin//2, text=f"HP: {mode.player.hp}")
             canvas.create_text(100, mode.board.topMargin//2, text="B11oons 2ower Defense")
-            #TODO change text to logo ^
 
         def drawBoard(mode, canvas):
             canvas.create_image(mode.app.width//2, mode.app.height//2, image=ImageTk.PhotoImage(mode.backgroundImage))
-            """
-            for row in range(mode.board.size):
-                for col in range(mode.board.size):
-                    if mode.board.grid[row][col] != None:
-                        canvas.create_rectangle(mode.board.getCellBounds(row, col), fill="yellow")
-            """
 
         def drawBalloons(mode, canvas):
             for balloon in mode.player.onBalloons:
-                cx, cy = balloon.position
+                if isinstance(balloon, Balloon.DisappearingBalloon) and not balloon.isVisible:
+                    continue
+                cx, cy = balloon.position[0], balloon.position[1]
                 r = balloon.radius
-                #TODO change this to an image roughly 20x20 pixels
-                canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill=balloon.color, width=0)
+
+                if balloon.isFrozen:
+                    canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="white", width=0)
+                else:
+                    canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill=balloon.color, width=0)
 
         def drawTowers(mode, canvas):
             for tower in mode.player.towers:
                 x = tower.location[0]
                 y = tower.location[1]
-                canvas.create_image(x, y, image=ImageTk.PhotoImage(mode.towerImage))
+                #r = tower.radius
+                #canvas.create_oval(x-r, y-r, x+r, y+r, fill="black")
+                if isinstance(tower, Tower.SuperTower):
+                    image = mode.supertowerImage
+                if isinstance(tower, Tower.QuadTower):
+                    image = mode.quadtowerImage
+                if isinstance(tower, Tower.FreezeTower):
+                    image = mode.freezetowerImage
+                else:
+                    image = mode.towerImage
+                canvas.create_image(x, y, image=ImageTk.PhotoImage(image))
 
         def drawBullets(mode, canvas):
-            print (mode.player.bullets)
             for bullet in mode.player.bullets:
                 cx = bullet.location[0]
                 cy = bullet.location[1]
                 r = bullet.radius
                 canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="black")
 
-    class TwoPlayerMode(Mode):
-        def appStarted(mode):
-            pass
-
-        def timerFired(mode):
-            pass
-
-        def mousePressed(mode, event):
-            pass
-
-        def keyPressed(mode, event):
-            pass
-
-        def redrawAll(mode, canvas):
-            pass
-
     class MyModalApp(ModalApp):
         def appStarted(app):
             app.splashScreenMode = SplashScreenMode()
-            app.onePlayerMode = OnePlayerMode()
-            app.twoPlayerMode = TwoPlayerMode()
+            app.easyMode = EasyMode()
+
             app.setActiveMode(app.splashScreenMode)
 
 
     app = MyModalApp(width=1200, height=720)
 
 runGame()
-
-

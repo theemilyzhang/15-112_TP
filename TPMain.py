@@ -6,6 +6,8 @@ import Tower
 import Board
 import math
 import Balloon
+import Cactus
+from mathFunctions import *
 
 #animation and graphics framework from http://www.cs.cmu.edu/~112/notes/notes-animations-part1.html
 #modal app from http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
@@ -136,6 +138,27 @@ def runGame():
                     tower.currentCoolDown -= 1
 
             ############################################################################################################
+            # CACTI
+            ############################################################################################################
+
+            for cactus in mode.player.cacti:
+                if cactus.currentCoolDown == 0:
+                    #attack if balloon intersect
+                    cx = cactus.location[0]
+                    cy = cactus.location[1]
+                    cr = cactus.radius
+                    for balloon in mode.player.onBalloons:
+                        bx = balloon.position[0]
+                        by = balloon.position[1]
+                        br = balloon.radius
+                        if itemsOverlap(cx, cy, bx, by, cr, br):
+                            balloon.hp -= 1
+                            mode.player.coins += 1
+                    cactus.currentCoolDown = cactus.defaultCoolDown - 1
+                else:
+                    cactus.currentCoolDown -= 1
+
+            ############################################################################################################
             # BULLETS
             ############################################################################################################
 
@@ -175,20 +198,33 @@ def runGame():
             #decrease player's coins, and turn mode off
             towerRadius = Tower.Tower((0, 0)).radius #pointless tower created just to access its radius
             if mode.player.placingTower != None:
-                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
-                    mode.player.illegallyPlacedTower = False
+                if mode.player.canPlaceItemHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedItem = False
                     mode.player.placingTower.location = (event.x, event.y)
                     mode.player.towers.append(mode.player.placingTower)
                     mode.player.coins -= Tower.Tower.price
                     mode.player.placingTower = None
                 else:
-                    mode.player.illegallyPlacedTower = True
+                    mode.player.illegallyPlacedItem = True
+            #ditto for cactus
+            cactusRadius = Cactus.Cactus((0, 0)).radius #pointless tower created just to access its radius
+            if mode.player.placingCactus != None:
+                if mode.player.canPlaceItemHere(event.x, event.y, towerRadius, mode.width, mode.height):
+                    mode.player.illegallyPlacedItem = False
+                    mode.player.placingCactus.location = (event.x, event.y)
+                    mode.player.cacti.append(mode.player.placingCactus)
+                    mode.player.coins -= Cactus.Cactus.price
+                    mode.player.placingCactus = None
+                else:
+                    mode.player.illegallyPlacedItem = True
+
 
 
         def mouseMoved(mode, event):
-            if mode.player.placingTower is not None:
+            if mode.player.placingTower != None:
                 mode.player.placingTower.location = (event.x, event.y)
-
+            if mode.player.placingCactus != None:
+                mode.player.placingCactus.location = (event.x, event.y)
 
         def keyPressed(mode, event):
             if (event.key == "t"):
@@ -203,22 +239,36 @@ def runGame():
             elif (event.key == "f"):
                 if mode.player.coins >= Tower.FreezeTower.price:
                     mode.player.placingTower = Tower.FreezeTower((0, 0))
+            elif (event.key == "c"):
+                if mode.player.coins >= Cactus.Cactus.price:
+                    mode.player.placingCactus = Cactus.Cactus((0, 0))
 
 
         def redrawAll(mode, canvas):
             mode.drawBoard(canvas) #includes bg image
-            mode.drawBalloons(canvas)
+            mode.drawCacti(canvas)
             mode.drawTowers(canvas)
             mode.drawBullets(canvas)
+            mode.drawBalloons(canvas)
+
             mode.drawTopBanner(canvas)
             mode.drawInstructions(canvas)
-            if mode.player.placingTower is not None:
+            if mode.player.placingTower != None:
                 mode.drawNewTowerOutline(canvas)
+            if mode.player.placingCactus != None:
+                mode.drawNewCactusOutline(canvas)
 
             if len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0:
                 mode.drawWinScreen(canvas)
             if mode.player.hp <= 0:
                 mode.drawLoseScreen(canvas)
+
+        def drawCacti(mode, canvas):
+            for cactus in mode.player.cacti:
+                x = cactus.location[0]
+                y = cactus.location[1]
+                r = cactus.radius
+                canvas.create_oval(x-r, y-r, x+r, y+r, fill="green", width=0) #TODO replace with image
 
         def drawWinScreen(mode, canvas):
             cx = mode.app.width//2
@@ -232,19 +282,26 @@ def runGame():
             canvas.create_rectangle(cx-200, cy-200, cx+200, cy+200, fill="white")
             canvas.create_text(cx, cy, text="Oh no! You lost.", font="raleway 30 bold")
 
-
         def drawInstructions(mode, canvas):
-            #placing towers
-            if mode.player.illegallyPlacedTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place the tower there. Try again.", font="raleway 30 bold")
+            #placing towers/cacti
+            if mode.player.illegallyPlacedItem:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place anything there. Try again.", font="raleway 30 bold")
             elif mode.player.placingTower != None:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the " + mode.player.placingTower.name + " placed.", font="raleway 30 bold")
+            elif mode.player.placingCactus != None:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the cactus placed.", font="raleway 30 bold")
 
         def drawNewTowerOutline(mode, canvas):
             x = mode.player.placingTower.location[0]
             y = mode.player.placingTower.location[1]
             r = mode.player.placingTower.radius
             canvas.create_oval(x-r, y-r, x+r, y+r)
+
+        def drawNewCactusOutline(mode, canvas):
+            x = mode.player.placingCactus.location[0]
+            y = mode.player.placingCactus.location[1]
+            r = mode.player.placingCactus.radius
+            canvas.create_oval(x-r, y-r, x+r, y+r, outline="green")
 
         def drawTopBanner(mode, canvas):
             width = mode.app.width

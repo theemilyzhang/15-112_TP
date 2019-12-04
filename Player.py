@@ -8,8 +8,10 @@ class Player(object):
         self.coins = 200
         self.towers = []
         self.bullets = []
+        self.cacti = []
         self.placingTower = None
-        self.illegallyPlacedTower = False
+        self.placingCactus = None
+        self.illegallyPlacedItem = False
 
         self.offBalloons = self.createBalloons()
         self.onBalloons = []
@@ -41,27 +43,36 @@ class Player(object):
         newTower = Tower.Tower((x, y))
         self.towers.append(newTower)
 
-    def canPlaceTowerHere(self, x, y, towerRadius, width, height):
+    def canPlaceItemHere(self, x, y, towerRadius, width, height):
         #return False if:
         #1: overlap with tower
-        #2: too close to balloon exit/entrance
+        #2: overlap with cactus
         #3: overlap with balloon
+        #4: too close to balloon exit/entrance
+
 
         #1
         for tower in self.towers:
-            if itemsOverlap(x, y, tower.location[0], tower.location[1], towerRadius, towerRadius):
+            if itemsOverlap(x, y, tower.location[0], tower.location[1], towerRadius, tower.radius):
                 return False
 
         #2
-        if getDistance(0, 0, x, y) < 4*towerRadius:
-            return False
-        elif getDistance(x, y, width, height) < 4*towerRadius:
-            return False
+        for cactus in self.cacti:
+            if itemsOverlap(x, y, cactus.location[0], cactus.location[1], towerRadius, cactus.radius):
+                return False
 
         #3
         for balloon in self.onBalloons:
             if itemsOverlap(x, y, balloon.position[0], balloon.position[1], towerRadius, balloon.radius):
                 return False
+
+        #4
+        if getDistance(0, 0, x, y) < 4 * towerRadius:
+            return False
+        elif getDistance(x, y, width, height) < 4 * towerRadius:
+            return False
+
+
 
         return True
 

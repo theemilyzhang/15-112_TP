@@ -8,7 +8,6 @@ class Tower(object):
     def __init__(self, location):
         self.location = location #tuple
         self.radius = 30
-        #TODO check if ^ is accurate
         self.defaultCoolDown = 20
         self.currentCoolDown = self.defaultCoolDown - 1
         self.name = "tower"

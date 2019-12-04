@@ -220,14 +220,7 @@ def runGame():
             if mode.player.illegallyPlacedTower:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place the tower there. Try again.", font="Raleway 30 bold")
             elif mode.player.placingTower != None:
-                if isinstance(mode.player.placingTower, Tower.FreezeTower):
-                    canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the freeze tower placed.", font="Raleway 30 bold")
-                elif isinstance(mode.player.placingTower, Tower.OctoTower):
-                    canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the octo tower placed.", font="Raleway 30 bold")
-                elif isinstance(mode.player.placingTower, Tower.SuperTower):
-                    canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the super tower placed.", font="Raleway 30 bold")
-                else:
-                    canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Raleway 30 bold")
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the " + mode.player.placingTower.name + " placed.", font="Raleway 30 bold")
 
 
         def drawTopBanner(mode, canvas):

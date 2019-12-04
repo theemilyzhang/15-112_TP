@@ -8,10 +8,7 @@ class Player(object):
         self.coins = 200
         self.towers = []
         self.bullets = []
-        self.isPlacingTower = False
-        self.isPlacingSuperTower = False
-        self.isPlacingOctoTower = False
-        self.isPlacingFreezeTower = False
+        self.placingTower = None
         self.illegallyPlacedTower = False
 
         self.offBalloons = self.createBalloons()

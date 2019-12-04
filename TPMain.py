@@ -172,43 +172,13 @@ def runGame():
             #if in placing tower mode, create tower where player clicked (if position is valid),
             #decrease player's coins, and turn mode off
             towerRadius = Tower.Tower((0, 0)).radius #pointless tower created just to access its radius
-            if mode.player.isPlacingTower:
+            if mode.player.placingTower != None:
                 if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
                     mode.player.illegallyPlacedTower = False
-                    newTower = Tower.Tower((event.x, event.y))
-                    mode.player.towers.append(newTower)
+                    mode.player.placingTower.location = (event.x, event.y)
+                    mode.player.towers.append(mode.player.placingTower)
                     mode.player.coins -= Tower.Tower.price
-                    mode.player.isPlacingTower = False
-                else:
-                    mode.player.illegallyPlacedTower = True
-
-            elif mode.player.isPlacingSuperTower:
-                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
-                    mode.player.illegallyPlacedTower = False
-                    newTower = Tower.SuperTower((event.x, event.y))
-                    mode.player.towers.append(newTower)
-                    mode.player.coins -= Tower.SuperTower.price
-                    mode.player.isPlacingSuperTower = False
-                else:
-                    mode.player.illegallyPlacedTower = True
-
-            elif mode.player.isPlacingOctoTower:
-                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
-                    mode.player.illegallyPlacedTower = False
-                    newTower = Tower.OctoTower((event.x, event.y))
-                    mode.player.towers.append(newTower)
-                    mode.player.coins -= Tower.OctoTower.price
-                    mode.player.isPlacingOctoTower = False
-                else:
-                    mode.player.illegallyPlacedTower = True
-
-            elif mode.player.isPlacingFreezeTower:
-                if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
-                    mode.player.illegallyPlacedTower = False
-                    newTower = Tower.FreezeTower((event.x, event.y))
-                    mode.player.towers.append(newTower)
-                    mode.player.coins -= Tower.FreezeTower.price
-                    mode.player.isPlacingFreezeTower = False
+                    mode.player.placingTower = None
                 else:
                     mode.player.illegallyPlacedTower = True
 
@@ -216,16 +186,16 @@ def runGame():
         def keyPressed(mode, event):
             if (event.key == "t"):
                 if mode.player.coins >= Tower.Tower.price:
-                    mode.player.isPlacingTower = True
+                    mode.player.placingTower = Tower.Tower((0, 0))
             elif (event.key == "s"):
                 if mode.player.coins >= Tower.SuperTower.price:
-                    mode.player.isPlacingSuperTower = True
+                    mode.player.placingTower = Tower.SuperTower((0, 0))
             elif (event.key == "8"):
                 if mode.player.coins >= Tower.OctoTower.price:
-                    mode.player.isPlacingOctoTower = True
+                    mode.player.placingTower = Tower.OctoTower((0, 0))
             elif (event.key == "f"):
                 if mode.player.coins >= Tower.FreezeTower.price:
-                    mode.player.isPlacingFreezeTower = True
+                    mode.player.placingTower = Tower.FreezeTower((0, 0))
 
 
 
@@ -249,14 +219,15 @@ def runGame():
             #placing towers
             if mode.player.illegallyPlacedTower:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place the tower there. Try again.", font="Raleway 30 bold")
-            elif mode.player.isPlacingTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Raleway 30 bold")
-            elif mode.player.isPlacingSuperTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the super tower placed.", font="Raleway 30 bold")
-            elif mode.player.isPlacingOctoTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the octo tower placed.", font="Raleway 30 bold")
-            elif mode.player.isPlacingFreezeTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the freeze tower placed.", font="Raleway 30 bold")
+            elif mode.player.placingTower != None:
+                if isinstance(mode.player.placingTower, Tower.FreezeTower):
+                    canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the freeze tower placed.", font="Raleway 30 bold")
+                elif isinstance(mode.player.placingTower, Tower.OctoTower):
+                    canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the octo tower placed.", font="Raleway 30 bold")
+                elif isinstance(mode.player.placingTower, Tower.SuperTower):
+                    canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the super tower placed.", font="Raleway 30 bold")
+                else:
+                    canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Raleway 30 bold")
 
 
         def drawTopBanner(mode, canvas):

@@ -41,20 +41,28 @@ class Player(object):
         self.towers.append(newTower)
 
     def canPlaceTowerHere(self, x, y, towerRadius, width, height):
-        #return False if overlap with tower or too close to balloon exit/entrance
+        #return False if:
+        #1: overlap with tower
+        #2: too close to balloon exit/entrance
+        #3: overlap with balloon
+
+        #1
         for tower in self.towers:
-            if self.towersOverlap(x, y, tower.location[0], tower.location[1], towerRadius):
+            if itemsOverlap(x, y, tower.location[0], tower.location[1], towerRadius, towerRadius):
                 return False
 
+        #2
         if getDistance(0, 0, x, y) < 3*towerRadius:
             return False
         elif getDistance(x, y, width, height) < 3*towerRadius:
             return False
 
+        #3
+        for balloon in self.onBalloons:
+            if itemsOverlap(x, y, balloon.position[0], balloon.position[1], towerRadius, balloon.radius):
+                return False
+
         return True
 
 
-    def towersOverlap(self, x0, y0, x1, y1, r):
-        if getDistance(x0, y0, x1, y1) > 2*r:
-            return False
-        return True
+

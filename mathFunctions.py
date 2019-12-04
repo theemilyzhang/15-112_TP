@@ -24,3 +24,8 @@ def getDifferenceBetweenTwoAngles(angle1, angle2):
         return abs(angle1 - angle2)
     else:
         return 2*math.pi - max(angle1, angle2) + min(angle1, angle2)
+
+def itemsOverlap(x0, y0, x1, y1, r0, r1):
+    if getDistance(x0, y0, x1, y1) > (r0 + r1):
+        return False
+    return True

@@ -183,6 +183,9 @@ def runGame():
                     mode.player.illegallyPlacedTower = True
 
 
+        def mouseMoved(mode, event):
+
+
         def keyPressed(mode, event):
             if (event.key == "t"):
                 if mode.player.coins >= Tower.Tower.price:
@@ -251,8 +254,8 @@ def runGame():
             for tower in mode.player.towers:
                 x = tower.location[0]
                 y = tower.location[1]
-                #r = tower.radius
-                #canvas.create_oval(x-r, y-r, x+r, y+r, fill="black")
+                r = tower.radius
+                canvas.create_oval(x-r, y-r, x+r, y+r)
                 if isinstance(tower, Tower.SuperTower):
                     image = mode.supertowerImage
                 elif isinstance(tower, Tower.OctoTower):

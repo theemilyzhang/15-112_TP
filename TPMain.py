@@ -26,12 +26,12 @@ def runGame():
             width = mode.app.width
             height = mode.app.height
 
-            # 1 player button
+            #easy button
             if (width*1//10 <= x <= width*3//10 and
                 height*3//4 <= y <= height*7//8):
                 mode.app.setActiveMode(mode.app.easyMode)
 
-            #2 player button
+            #hard button
             if (width*7//10 <= x <= width*9//10 and
                 height*3//4 <= y <= height*7//8):
                 mode.app.setActiveMode(mode.app.hardMode)
@@ -52,11 +52,12 @@ def runGame():
                                     fill="light blue")
             canvas.create_text(width*2//10, height*13//16,
                                text="Easy Mode", font="Raleway 35")
-            canvas.create_rectangle(width*4//10, height*3//4,
-                                    width*6//10, height*7//8,
-                                    fill="light blue")
-            canvas.create_text(width*5//10, height*13//16,
-                               text="Medium Mode", font="Raleway 35")
+
+            # canvas.create_rectangle(width*4//10, height*3//4,
+            #                         width*6//10, height*7//8,
+            #                         fill="light blue")
+            # canvas.create_text(width*5//10, height*13//16,
+            #                    text="Medium Mode", font="Raleway 35")
             canvas.create_rectangle(width*7//10, height*3//4,
                                     width*9//10, height*7//8,
                                     fill="light blue")
@@ -79,6 +80,9 @@ def runGame():
             mode.octotowerImage = mode.scaleImage(octotowerImageUnscaled, 1/15)
             freezetowerImageUnscaled = mode.loadImage("freezetower.png")
             mode.freezetowerImage = mode.scaleImage(freezetowerImageUnscaled, 1/15)
+            cactusImageUnscaled = mode.loadImage("cactus.png")
+            mode.cactusImage = mode.scaleImage(cactusImageUnscaled, 1/10)
+
 
             mode.backgroundImage = mode.loadImage("sky.jpg")
 
@@ -195,7 +199,6 @@ def runGame():
                 mode.app.paused = True
 
 
-
         def mousePressed(mode, event):
             #if in placing tower mode, create tower where player clicked (if position is valid),
             #decrease player's coins, and turn mode off
@@ -222,12 +225,12 @@ def runGame():
                     mode.player.illegallyPlacedItem = True
 
 
-
         def mouseMoved(mode, event):
             if mode.player.placingTower != None:
                 mode.player.placingTower.location = (event.x, event.y)
             if mode.player.placingCactus != None:
                 mode.player.placingCactus.location = (event.x, event.y)
+
 
         def keyPressed(mode, event):
             if (event.key == "t"):
@@ -271,7 +274,8 @@ def runGame():
                 x = cactus.location[0]
                 y = cactus.location[1]
                 r = cactus.radius
-                canvas.create_oval(x-r, y-r, x+r, y+r, fill="green", width=0) #TODO replace with image
+                canvas.create_oval(x-r, y-r, x+r, y+r, fill="dark green", width=0) #TODO replace with image
+                canvas.create_image(x, y, image=ImageTk.PhotoImage(mode.cactusImage))
 
         def drawWinScreen(mode, canvas):
             cx = mode.app.width//2
@@ -359,12 +363,15 @@ def runGame():
                 r = bullet.radius
                 canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="black")
 
+    class HardMode(EasyMode):
+        def appStarted(mode):
+            super().appStarted()
 
     class MyModalApp(ModalApp):
         def appStarted(app):
             app.splashScreenMode = SplashScreenMode()
             app.easyMode = EasyMode()
-
+            app.hardMode = HardMode()
             app.setActiveMode(app.splashScreenMode)
 
 

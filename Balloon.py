@@ -224,7 +224,7 @@ class BlueBalloon(Balloon):
 class GreenBalloon(Balloon):
     def __init__(self):
         super().__init__()
-        self.color = "green"
+        self.color = "light green"
         self.speed = 5
         self.hp = 3
 

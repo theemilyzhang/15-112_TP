@@ -17,16 +17,17 @@ class Player(object):
     def createBalloons(self):
         #TODO make it automatically generate based on level mode
         balloons = []
-
-        for i in range(15):
-            balloons.append(Balloon.ToughBalloon())
-            balloons.append(Balloon.ToughBalloon())
-            balloons.append(Balloon.ToughBalloon())
-
-        balloons.append(Balloon.Balloon())
-        balloons.append(Balloon.Balloon())
-        balloons.append(Balloon.FastBalloon())
-        balloons.append(Balloon.ToughBalloon())
+        # for i in range(5):
+        #     balloons.append(Balloon.PinkBalloon())
+        # for i in range(5):
+        #     balloons.append(Balloon.YellowBalloon())
+        # for i in range(5):
+        #     balloons.append(Balloon.GreenBalloon())
+        # for i in range(5):
+        #     balloons.append(Balloon.BlueBalloon())
+        # for i in range(5):
+        #     balloons.append(Balloon.Balloon())
+        balloons.append(Balloon.Blimp())
         return balloons
 
     def moveBalloonOn(self, board):

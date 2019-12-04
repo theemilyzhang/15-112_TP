@@ -106,7 +106,6 @@ def runGame():
 
             #1: move balloons by ideal direction
             #2: turn disappearingBalloons on/off
-            #3: change color for toughBalloon if hp
             for balloon in mode.player.onBalloons:
                 if balloon.isFrozen:
                     continue #never gets here
@@ -122,10 +121,7 @@ def runGame():
                         balloon.isVisible = False
                     else:
                         balloon.isVisible = True
-                #3
-                elif isinstance(balloon, Balloon.ToughBalloon):
-                    if balloon.hp == 1:
-                        balloon.color = "red"
+
 
             ############################################################################################################
             # TOWERS

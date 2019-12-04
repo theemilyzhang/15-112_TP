@@ -20,10 +20,10 @@ class Bullet(object):
                 if self.isFreeze:
                     balloon.isFrozen = True
                 else:
-                    #decrement balloon hp, then remove if dead
-                    balloon.hp -= 1
-                    if balloon.hp <= 0:
-                        onBalloons.remove(balloon)
+                    newBalloon = balloon.getWeakerBalloon()
+                    onBalloons.remove(balloon)
+                    if newBalloon.hp > 0:
+                        onBalloons.append(newBalloon)
                 return True
         return False
 

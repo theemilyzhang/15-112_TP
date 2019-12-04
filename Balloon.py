@@ -14,6 +14,10 @@ class Balloon(object):
         self.angleIncrement = math.pi/16
         self.isFrozen = False
 
+    def getWeakerBalloon(self):
+        self.hp = 0
+        return self
+
     def getDirection(self, towers, endX, endY):
         bx = self.position[0]
         by = self.position[1]
@@ -197,12 +201,6 @@ class Balloon(object):
             counter += 1
         pass
 
-class FastBalloon(Balloon):
-    def __init__(self):
-        super().__init__()
-        self.color = "blue"
-        self.speed = 6
-
 class DisappearingBalloon(Balloon):
     def __init__(self):
         super().__init__()
@@ -210,10 +208,66 @@ class DisappearingBalloon(Balloon):
         self.isVisible = True
         self.timeSinceCreation = 0
 
-class ToughBalloon(Balloon):
+class BlueBalloon(Balloon):
+    def __init__(self):
+        super().__init__()
+        self.color = "blue"
+        self.speed = 4
+        self.hp = 2
+
+    def getWeakerBalloon(self):
+        balloon = Balloon()
+        balloon.position = self.position
+        balloon.distanceTraveled = self.distanceTraveled
+        return balloon
+
+class GreenBalloon(Balloon):
+    def __init__(self):
+        super().__init__()
+        self.color = "green"
+        self.speed = 5
+        self.hp = 3
+
+    def getWeakerBalloon(self):
+        balloon = BlueBalloon()
+        balloon.position = self.position
+        balloon.distanceTraveled = self.distanceTraveled
+        return balloon
+
+class YellowBalloon(Balloon):
+    def __init__(self):
+        super().__init__()
+        self.color = "yellow"
+        self.speed = 6
+        self.hp = 4
+
+    def getWeakerBalloon(self):
+        balloon = GreenBalloon()
+        balloon.position = self.position
+        balloon.distanceTraveled = self.distanceTraveled
+        return balloon
+
+class PinkBalloon(Balloon):
     def __init__(self):
         super().__init__()
         self.color = "pink"
-        self.hp = 2
+        self.speed = 7
+        self.hp = 5
 
-    #TODO: add method that makes it change color if hp = 1
+    def getWeakerBalloon(self):
+        balloon = YellowBalloon()
+        balloon.position = self.position
+        balloon.distanceTraveled = self.distanceTraveled
+        return balloon
+
+class Blimp(Balloon):
+    def __init__(self):
+        super().__init__()
+        self.color = "black"
+        self.speed = 4
+        self.hp = 100
+        self.radius = 25
+
+    def getWeakerBalloon(self):
+        self.hp -= 1
+        return self

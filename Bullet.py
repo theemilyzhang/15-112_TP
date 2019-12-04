@@ -32,10 +32,10 @@ class Bullet(object):
         buly1 = self.location[1]
         bulx0 = bulx1 - (self.dx * self.speed)
         buly0 = buly1 - (self.dy * self.speed)
-        bulr = self.radius
+        bulr = self.radius + 5
         balx = balloon.position[0]
         baly = balloon.position[1]
-        balr = balloon.radius
+        balr = balloon.radius + 5
         bothr = bulr + balr
 
         #if balloon is in terminal circle
@@ -54,17 +54,12 @@ class Bullet(object):
                 return True
             return False
         else:
-            bulSlope = -self.dy/self.dx
-
-            #if balloon is in rectangle
-            perpSlope = -1 * (1/bulSlope)
-            intersectX = solveIntersectX(bulSlope, bulx1, buly1, perpSlope, balx, baly)
-            intersectY = bulSlope * (intersectX - bulx0) + buly0
-            balBulCenterDistRectangle = getDistance(balx, baly, intersectX, intersectY)
-
-            if (min(bulx0, bulx1) <= intersectX <= max(bulx0, bulx1) and
-                    min(buly0, buly1) <= intersectY <= max(buly0, buly1) and
-                    balBulCenterDistRectangle <= bothr):
-                return True
-
+            dx = bulx1 - bulx0
+            dy = buly1 - buly0
+            for x in range(20):
+                balBulCenterDistCircle = getDistance(balx, baly, bulx1, buly1)
+                if balBulCenterDistCircle <= bothr:
+                    return True
+                bulx0 += dx / 20
+                buly0 += dy / 20
             return False

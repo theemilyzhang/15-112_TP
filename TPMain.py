@@ -152,7 +152,10 @@ def runGame():
                         by = balloon.position[1]
                         br = balloon.radius
                         if itemsOverlap(cx, cy, bx, by, cr, br):
-                            balloon.hp -= 1
+                            newBalloon = balloon.getWeakerBalloon()
+                            mode.player.onBalloons.remove(balloon)
+                            if newBalloon.hp > 0:
+                                mode.player.onBalloons.append(newBalloon)
                             mode.player.coins += 1
                     cactus.currentCoolDown = cactus.defaultCoolDown - 1
                 else:

@@ -10,7 +10,7 @@ class Player(object):
         self.bullets = []
         self.isPlacingTower = False
         self.isPlacingSuperTower = False
-        self.isPlacingQuadTower = False
+        self.isPlacingOctoTower = False
         self.isPlacingFreezeTower = False
         self.illegallyPlacedTower = False
 

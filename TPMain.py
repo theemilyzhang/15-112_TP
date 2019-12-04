@@ -73,8 +73,8 @@ def runGame():
             mode.towerImage = mode.scaleImage(towerImageUnscaled, 1/15)
             supertowerImageUnscaled = mode.loadImage("supertower.png")
             mode.supertowerImage = mode.scaleImage(supertowerImageUnscaled, 1/15)
-            quadtowerImageUnscaled = mode.loadImage("quadtower.png")
-            mode.quadtowerImage = mode.scaleImage(quadtowerImageUnscaled, 1/15)
+            octotowerImageUnscaled = mode.loadImage("octotower.png")
+            mode.octotowerImage = mode.scaleImage(octotowerImageUnscaled, 1/15)
             freezetowerImageUnscaled = mode.loadImage("freezetower.png")
             mode.freezetowerImage = mode.scaleImage(freezetowerImageUnscaled, 1/15)
 
@@ -109,7 +109,7 @@ def runGame():
             #3: change color for toughBalloon if hp
             for balloon in mode.player.onBalloons:
                 if balloon.isFrozen:
-                    continue
+                    continue #never gets here
                 #1
                 direction = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
                 dx, dy = math.cos(direction), -math.sin(direction) #unit vectors
@@ -192,13 +192,13 @@ def runGame():
                 else:
                     mode.player.illegallyPlacedTower = True
 
-            elif mode.player.isPlacingQuadTower:
+            elif mode.player.isPlacingOctoTower:
                 if mode.player.canPlaceTowerHere(event.x, event.y, towerRadius, mode.width, mode.height):
                     mode.player.illegallyPlacedTower = False
-                    newTower = Tower.QuadTower((event.x, event.y))
+                    newTower = Tower.OctoTower((event.x, event.y))
                     mode.player.towers.append(newTower)
-                    mode.player.coins -= Tower.QuadTower.price
-                    mode.player.isPlacingQuadTower = False
+                    mode.player.coins -= Tower.OctoTower.price
+                    mode.player.isPlacingOctoTower = False
                 else:
                     mode.player.illegallyPlacedTower = True
 
@@ -220,9 +220,9 @@ def runGame():
             elif (event.key == "s"):
                 if mode.player.coins >= Tower.SuperTower.price:
                     mode.player.isPlacingSuperTower = True
-            elif (event.key == "q"):
-                if mode.player.coins >= Tower.QuadTower.price:
-                    mode.player.isPlacingQuadTower = True
+            elif (event.key == "8"):
+                if mode.player.coins >= Tower.OctoTower.price:
+                    mode.player.isPlacingOctoTower = True
             elif (event.key == "f"):
                 if mode.player.coins >= Tower.FreezeTower.price:
                     mode.player.isPlacingFreezeTower = True
@@ -253,6 +253,10 @@ def runGame():
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Raleway 30 bold")
             elif mode.player.isPlacingSuperTower:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the super tower placed.", font="Raleway 30 bold")
+            elif mode.player.isPlacingOctoTower:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the octo tower placed.", font="Raleway 30 bold")
+            elif mode.player.isPlacingFreezeTower:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the freeze tower placed.", font="Raleway 30 bold")
 
 
         def drawTopBanner(mode, canvas):
@@ -287,9 +291,9 @@ def runGame():
                 #canvas.create_oval(x-r, y-r, x+r, y+r, fill="black")
                 if isinstance(tower, Tower.SuperTower):
                     image = mode.supertowerImage
-                if isinstance(tower, Tower.QuadTower):
-                    image = mode.quadtowerImage
-                if isinstance(tower, Tower.FreezeTower):
+                elif isinstance(tower, Tower.OctoTower):
+                    image = mode.octotowerImage
+                elif isinstance(tower, Tower.FreezeTower):
                     image = mode.freezetowerImage
                 else:
                     image = mode.towerImage

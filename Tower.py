@@ -51,7 +51,7 @@ class SuperTower(Tower): #faster cooldown, shoots by predicting balloon position
 
     #TODO shoot by predicting balloon position
 
-class QuadTower(Tower):
+class OctoTower(Tower):
     price = 20
     towerRange = 400
     def __init__(self, location):
@@ -69,14 +69,14 @@ class QuadTower(Tower):
         #left: dx = -1, dy = 0
         bullets.append(Bullet.Bullet(self.location, -1, 0))
 
-        #up-left: dx = -1, dy = -1
-        bullets.append(Bullet.Bullet(self.location, -1, -1))
-        #up-right: dx = 1, dy = -1
-        bullets.append(Bullet.Bullet(self.location, 1, -1))
-        #down-left: dx = -1, dy = 1
-        bullets.append(Bullet.Bullet(self.location, -1, 1))
-        #down-right: dx = 1, dy = 1
-        bullets.append(Bullet.Bullet(self.location, 1, 1))
+        #up-left: dx = -1/sqrt2, dy = -1/sqrt2
+        bullets.append(Bullet.Bullet(self.location, -1/(2**.5), -1/(2**.5)))
+        #up-right: dx = 1/sqrt2, dy = -1/sqrt2
+        bullets.append(Bullet.Bullet(self.location, 1/(2**.5), -1/(2**.5)))
+        #down-left: dx = -1/sqrt2, dy = 1/sqrt2
+        bullets.append(Bullet.Bullet(self.location, -1/(2**.5), 1/(2**.5)))
+        #down-right: dx = 1/sqrt2, dy = 1/sqrt2
+        bullets.append(Bullet.Bullet(self.location, 1/(2**.5), 1/(2**.5)))
 
         return bullets
 

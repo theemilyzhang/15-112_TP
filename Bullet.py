@@ -17,10 +17,13 @@ class Bullet(object):
         #note: bullet is at new location (already been moved)
         for balloon in onBalloons:
             if self.collidedWithBalloon(balloon):
-                #decrement balloon hp, then remove if dead
-                balloon.hp -= 1
-                if balloon.hp <= 0:
-                    onBalloons.remove(balloon)
+                if self.isFreeze:
+                    balloon.isFrozen = True
+                else:
+                    #decrement balloon hp, then remove if dead
+                    balloon.hp -= 1
+                    if balloon.hp <= 0:
+                        onBalloons.remove(balloon)
                 return True
         return False
 

@@ -184,6 +184,8 @@ def runGame():
 
 
         def mouseMoved(mode, event):
+            if mode.player.placingTower is not None:
+                mode.player.placingTower.location = (event.x, event.y)
 
 
         def keyPressed(mode, event):
@@ -209,6 +211,8 @@ def runGame():
             mode.drawTowers(canvas)
             mode.drawBullets(canvas)
             mode.drawInstructions(canvas)
+            if mode.player.placingTower is not None:
+                mode.drawNewTowerOutline(canvas)
 
             if len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0:
                 #TODO draw win screen (mode)
@@ -225,6 +229,11 @@ def runGame():
             elif mode.player.placingTower != None:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the " + mode.player.placingTower.name + " placed.", font="Raleway 30 bold")
 
+        def drawNewTowerOutline(mode, canvas):
+            x = mode.player.placingTower.location[0]
+            y = mode.player.placingTower.location[1]
+            r = mode.player.placingTower.radius
+            canvas.create_oval(x-r, y-r, x+r, y+r)
 
         def drawTopBanner(mode, canvas):
             width = mode.app.width

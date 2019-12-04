@@ -73,7 +73,7 @@ class FreezeTower(Tower):
     price = 20
     towerRange = 200
     def __init__(self, location):
-        super().__init__(location):
+        super().__init__(location)
 
 
 

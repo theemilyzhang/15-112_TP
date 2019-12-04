@@ -27,7 +27,7 @@ class Player(object):
             balloons.append(Balloon.Balloon())
             balloons.append(Balloon.FastBalloon())
         """
-        balloons.append(Balloon.FreezeBalloon)
+        balloons.append(Balloon.FreezeBalloon())
         balloons.append(Balloon.QuadBalloon())
         return balloons
 

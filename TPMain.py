@@ -13,6 +13,7 @@ import Balloon
 #sky image from http://www.alpharoofinginc.com/roofing-sky-background-3-2-jpg/
 
 def runGame():
+
     class SplashScreenMode(Mode):
         def appStarted(mode):
             mode.backgroundImage = mode.loadImage("sky.jpg")
@@ -26,41 +27,39 @@ def runGame():
             # 1 player button
             if (width*1//10 <= x <= width*3//10 and
                 height*3//4 <= y <= height*7//8):
-                mode.app.setActiveMode(mode.app.onePlayerMode)
+                mode.app.setActiveMode(mode.app.easyMode)
 
             #2 player button
             if (width*7//10 <= x <= width*9//10 and
                 height*3//4 <= y <= height*7//8):
-                mode.app.setActiveMode(mode.app.twoPlayerMode)
+                mode.app.setActiveMode(mode.app.hardMode)
 
 
         def redrawAll(mode, canvas):
             width = mode.app.width
             height = mode.app.height
-            #todo: draw background
             canvas.create_image(mode.app.width//2, mode.app.height//2, image=ImageTk.PhotoImage(mode.backgroundImage))
 
             #draw logo
-            #todo: add image later
             canvas.create_text(width//2, height//2,
-                               text="Bloons Tower Defense", font="Arial 50")
+                               text="Bloons Tower Defense", font="Raleway 50")
 
             #draw buttons
             canvas.create_rectangle(width*1//10, height*3//4,
                                     width*3//10, height*7//8,
                                     fill="light blue")
             canvas.create_text(width*2//10, height*13//16,
-                               text="1 Player", font="Arial 35")
+                               text="Easy Mode", font="Raleway 35")
             canvas.create_rectangle(width*4//10, height*3//4,
                                     width*6//10, height*7//8,
                                     fill="light blue")
             canvas.create_text(width*5//10, height*13//16,
-                               text="Versus AI", font="Arial 35")
+                               text="Medium Mode", font="Raleway 35")
             canvas.create_rectangle(width*7//10, height*3//4,
                                     width*9//10, height*7//8,
                                     fill="light blue")
             canvas.create_text(width*8//10, height*13//16,
-                               text="2 Player", font="Arial 35")
+                               text="Hard Mode", font="Raleway 35")
 
 
     class EasyMode(Mode):
@@ -68,8 +67,17 @@ def runGame():
             mode.player = Player.Player()
             mode.board = Board.Board(mode.width, mode.height)
             mode.clock = 0
+
+            #images
             towerImageUnscaled = mode.loadImage("tower.png")
             mode.towerImage = mode.scaleImage(towerImageUnscaled, 1/15)
+            supertowerImageUnscaled = mode.loadImage("supertower.png")
+            mode.supertowerImage = mode.scaleImage(supertowerImageUnscaled, 1/15)
+            quadtowerImageUnscaled = mode.loadImage("quadtower.png")
+            mode.quadtowerImage = mode.scaleImage(quadtowerImageUnscaled, 1/15)
+            freezetowerImageUnscaled = mode.loadImage("freezetower.png")
+            mode.freezetowerImage = mode.scaleImage(freezetowerImageUnscaled, 1/15)
+
             mode.backgroundImage = mode.loadImage("sky.jpg")
             #mode.timerDelay = 17 #TODO is this how i can make it faster bc its not working
 
@@ -235,7 +243,6 @@ def runGame():
             mode.drawBalloons(canvas)
             mode.drawTowers(canvas)
             mode.drawBullets(canvas)
-
             mode.drawInstructions(canvas)
 
             if len(mode.player.onBalloons) == 0 and len(mode.player.offBalloons) == 0:
@@ -249,11 +256,11 @@ def runGame():
         def drawInstructions(mode, canvas):
             #placing towers
             if mode.player.illegallyPlacedTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place the tower there. Try again.", font="Arial 30 bold")
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place the tower there. Try again.", font="Raleway 30 bold")
             elif mode.player.isPlacingTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Arial 30 bold")
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the tower placed.", font="Raleway 30 bold")
             elif mode.player.isPlacingSuperTower:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the super tower placed.", font="Arial 30 bold")
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the super tower placed.", font="Raleway 30 bold")
 
 
         def drawTopBanner(mode, canvas):
@@ -286,7 +293,15 @@ def runGame():
                 y = tower.location[1]
                 #r = tower.radius
                 #canvas.create_oval(x-r, y-r, x+r, y+r, fill="black")
-                canvas.create_image(x, y, image=ImageTk.PhotoImage(mode.towerImage))
+                if isinstance(tower, Tower.SuperTower):
+                    image = mode.supertowerImage
+                if isinstance(tower, Tower.QuadTower):
+                    image = mode.quadtowerImage
+                if isinstance(tower, Tower.FreezeTower):
+                    image = mode.freezetowerImage
+                else:
+                    image = mode.towerImage
+                canvas.create_image(x, y, image=ImageTk.PhotoImage(image))
 
         def drawBullets(mode, canvas):
             for bullet in mode.player.bullets:
@@ -299,6 +314,7 @@ def runGame():
         def appStarted(app):
             app.splashScreenMode = SplashScreenMode()
             app.easyMode = EasyMode()
+
             app.setActiveMode(app.splashScreenMode)
 
 

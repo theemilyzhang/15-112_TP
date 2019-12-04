@@ -36,10 +36,10 @@ class Tower(object):
             scaleFactor = (deltaX**2 + deltaY**2)**.5
             dx = deltaX/scaleFactor
             dy = deltaY/scaleFactor
-            return Bullet.Bullet(self.location, dx, dy)
+            return [Bullet.Bullet(self.location, dx, dy)]
             #return bullet with location of tower and dx dy according to balloon it's shooting at
 
-        return None
+        return []
 
 class SuperTower(Tower): #faster cooldown, shoots by predicting balloon position
     price = 40
@@ -53,19 +53,30 @@ class SuperTower(Tower): #faster cooldown, shoots by predicting balloon position
 
 class QuadTower(Tower):
     price = 20
+    towerRange = 400
     def __init__(self, location):
         super().__init__(location)
 
-    def create4Bullets(self, location):
+    def createBulletIfInRange(self, onBalloons):
         bullets = []
+
         #up: dx = 0, dy = -1
-        bullets.append(Bullet.Bullet(location, 0, -1))
+        bullets.append(Bullet.Bullet(self.location, 0, -1))
         #down: dx = 0, dy = 1
-        bullets.append(Bullet.Bullet(location, 0, 1))
+        bullets.append(Bullet.Bullet(self.location, 0, 1))
         #right: dx = 1, dy = 0
-        bullets.append(Bullet.Bullet(location, 1, 0))
+        bullets.append(Bullet.Bullet(self.location, 1, 0))
         #left: dx = -1, dy = 0
-        bullets.append(Bullet.Bullet(location, -1, 0))
+        bullets.append(Bullet.Bullet(self.location, -1, 0))
+
+        #up-left: dx = -1, dy = -1
+        bullets.append(Bullet.Bullet(self.location, -1, -1))
+        #up-right: dx = 1, dy = -1
+        bullets.append(Bullet.Bullet(self.location, 1, -1))
+        #down-left: dx = -1, dy = 1
+        bullets.append(Bullet.Bullet(self.location, -1, 1))
+        #down-right: dx = 1, dy = 1
+        bullets.append(Bullet.Bullet(self.location, 1, 1))
 
         return bullets
 
@@ -74,6 +85,14 @@ class FreezeTower(Tower):
     towerRange = 200
     def __init__(self, location):
         super().__init__(location)
+
+    def createBulletIfInRange(self, onBalloons):
+        bullets = super().createBulletIfInRange(onBalloons)
+
+        for bullet in bullets:
+            bullet.isFreeze = True
+
+        return bullets
 
 
 

@@ -3,7 +3,7 @@ import math
 
 
 class Balloon(object):
-    def __init__(self, speed=5, hp=1, color="red"):
+    def __init__(self, speed=3, hp=1, color="red"):
         self.speed = speed
         self.hp = hp
         self.color = color
@@ -201,7 +201,7 @@ class FastBalloon(Balloon):
     def __init__(self):
         super().__init__()
         self.color = "blue"
-        self.speed = 10
+        self.speed = 6
 
 class DisappearingBalloon(Balloon):
     def __init__(self):

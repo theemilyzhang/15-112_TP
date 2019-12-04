@@ -30,22 +30,28 @@ class Bullet(object):
         bulx0 = bulx1 - (self.dx * self.speed)
         buly0 = buly1 - (self.dy * self.speed)
         bulr = self.radius
+        balx = balloon.position[0]
+        baly = balloon.position[1]
+        balr = balloon.radius
+        bothr = bulr + balr
+
+        #if balloon is in terminal circle
+        balBulCenterDistCircle = getDistance(balx, baly, bulx1, buly1)
+        if balBulCenterDistCircle <= bothr:
+            return True
 
         if self.dx == 0:
-            # todo write logic for when the slope is essentially infinite
+            #if balloon is in rectangle
+            if abs(bulx1 - balx) < bothr and (buly0 <= baly <= buly1 or buly1 <= baly <= buly0):
+                return True
+            return False
+        elif self.dy == 0:
+            #if balloon is in rectangle
+            if abs(buly1 - baly) < bothr and (bulx0 <= balx <= bulx1 or bulx1 <= balx <= bulx0):
+                return True
+            return False
         else:
             bulSlope = -self.dy/self.dx
-
-            balx = balloon.position[0]
-            baly = balloon.position[1]
-            balr = balloon.radius
-
-            bothr = bulr + balr
-
-            #if balloon is in terminal circle
-            balBulCenterDistCircle = getDistance(balx, baly, bulx1, buly1)
-            if balBulCenterDistCircle <= bothr:
-                return True
 
             #if balloon is in rectangle
             perpSlope = -1 * (1/bulSlope)

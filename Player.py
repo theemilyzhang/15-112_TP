@@ -21,12 +21,11 @@ class Player(object):
         #TODO make it automatically generate based on level mode
         balloons = []
 
-        """
         for i in range(15):
-            balloons.append(Balloon.Balloon())
-            balloons.append(Balloon.Balloon())
-            balloons.append(Balloon.FastBalloon())
-        """
+            balloons.append(Balloon.ToughBalloon())
+            balloons.append(Balloon.ToughBalloon())
+            balloons.append(Balloon.ToughBalloon())
+
         balloons.append(Balloon.Balloon())
         balloons.append(Balloon.Balloon())
         balloons.append(Balloon.FastBalloon())

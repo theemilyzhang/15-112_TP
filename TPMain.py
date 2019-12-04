@@ -133,17 +133,9 @@ def runGame():
 
             for tower in mode.player.towers:
                 if tower.currentCoolDown == 0:
-                    if isinstance(tower, Tower.QuadTower):
-                        #create bullets in 4 directions
-                        newBullets = tower.create4Bullets(tower.location)
-                        mode.player.bullets.extend(newBullets)
-                    else:
-                        #add bullet to start of list with position at tower position (if shooting)
-                        newBullet = tower.createBulletIfInRange(mode.player.onBalloons)
-                        if newBullet != None:
-                            if isinstance(tower, Tower.FreezeTower):
-                                newBullet.isFreeze = True
-                            mode.player.bullets.append(newBullet)
+                    #add bullet to start of list with position at tower position (if shooting)
+                    newBullets = tower.createBulletIfInRange(mode.player.onBalloons)
+                    mode.player.bullets.extend(newBullets)
                     tower.currentCoolDown = tower.defaultCoolDown - 1
                 else:
                     tower.currentCoolDown -= 1

@@ -30,28 +30,32 @@ class Bullet(object):
         bulx0 = bulx1 - (self.dx * self.speed)
         buly0 = buly1 - (self.dy * self.speed)
         bulr = self.radius
-        bulSlope = -self.dy/self.dx
 
-        balx = balloon.position[0]
-        baly = balloon.position[1]
-        balr = balloon.radius
+        if self.dx == 0:
+            # todo write logic for when the slope is essentially infinite
+        else:
+            bulSlope = -self.dy/self.dx
 
-        bothr = bulr + balr
+            balx = balloon.position[0]
+            baly = balloon.position[1]
+            balr = balloon.radius
 
-        #if balloon is in terminal circle
-        balBulCenterDistCircle = getDistance(balx, baly, bulx1, buly1)
-        if balBulCenterDistCircle <= bothr:
-            return True
+            bothr = bulr + balr
 
-        #if balloon is in rectangle
-        perpSlope = -1 * (1/bulSlope)
-        intersectX = solveIntersectX(bulSlope, bulx1, buly1, perpSlope, balx, baly)
-        intersectY = bulSlope * (intersectX - bulx0) + buly0
-        balBulCenterDistRectangle = getDistance(balx, baly, intersectX, intersectY)
+            #if balloon is in terminal circle
+            balBulCenterDistCircle = getDistance(balx, baly, bulx1, buly1)
+            if balBulCenterDistCircle <= bothr:
+                return True
 
-        if (min(bulx0, bulx1) <= intersectX <= max(bulx0, bulx1) and
-                min(buly0, buly1) <= intersectY <= max(buly0, buly1) and
-                balBulCenterDistRectangle <= bothr):
-            return True
+            #if balloon is in rectangle
+            perpSlope = -1 * (1/bulSlope)
+            intersectX = solveIntersectX(bulSlope, bulx1, buly1, perpSlope, balx, baly)
+            intersectY = bulSlope * (intersectX - bulx0) + buly0
+            balBulCenterDistRectangle = getDistance(balx, baly, intersectX, intersectY)
 
-        return False
+            if (min(bulx0, bulx1) <= intersectX <= max(bulx0, bulx1) and
+                    min(buly0, buly1) <= intersectY <= max(buly0, buly1) and
+                    balBulCenterDistRectangle <= bothr):
+                return True
+
+            return False

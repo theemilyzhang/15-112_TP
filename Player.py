@@ -29,8 +29,8 @@ class Player(object):
         """
         balloons.append(Balloon.Balloon())
         balloons.append(Balloon.Balloon())
-        balloons.append(Balloon.FastBalloon)
-        balloons.append(Balloon.ToughBalloon)
+        balloons.append(Balloon.FastBalloon())
+        balloons.append(Balloon.ToughBalloon())
         return balloons
 
     def moveBalloonOn(self, board):

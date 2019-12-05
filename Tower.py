@@ -49,8 +49,6 @@ class SuperTower(Tower): #faster cooldown, shoots by predicting balloon position
         self.name = "super tower"
         self.price = 40
 
-    #TODO shoot by predicting balloon position
-
 class OctoTower(Tower):
     def __init__(self, location):
         super().__init__(location)

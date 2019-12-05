@@ -286,7 +286,7 @@ def runGame():
                 x = cactus.location[0]
                 y = cactus.location[1]
                 r = cactus.radius
-                canvas.create_oval(x-r, y-r, x+r, y+r, fill="dark green", width=0) #TODO replace with image
+                canvas.create_oval(x-r, y-r, x+r, y+r, fill="dark green", width=0)
                 canvas.create_image(x, y, image=ImageTk.PhotoImage(mode.cactusImage))
 
         def drawWinScreen(mode, canvas):

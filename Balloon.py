@@ -12,7 +12,8 @@ class Balloon(object):
         self.radius = 10
         self.coins = 1
         self.angleIncrement = math.pi/16
-        self.isFrozen = False
+        self.defaultFrozenCountdown = 50
+        self.frozenCountdown = 0
 
     def getWeakerBalloon(self):
         self.hp = 0
@@ -163,8 +164,8 @@ class Balloon(object):
         return False
 
     def inTowerRange(self, tower, dx, dy):
-        bx = self.location[0]
-        by = self.location[1]
+        bx = self.position[0]
+        by = self.position[1]
         br = self.radius
 
         tx = tower.location[0]
@@ -265,7 +266,7 @@ class Blimp(Balloon):
         super().__init__()
         self.color = "grey"
         self.speed = 2
-        self.hp = 1000
+        self.hp = 100
         self.radius = 25
 
     def getWeakerBalloon(self):

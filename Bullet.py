@@ -18,7 +18,8 @@ class Bullet(object):
         for balloon in onBalloons:
             if self.collidedWithBalloon(balloon):
                 if self.isFreeze:
-                    balloon.isFrozen = True
+                    if balloon.frozenCountdown == 0:
+                        balloon.frozenCountdown = balloon.defaultFrozenCountdown
                 else:
                     newBalloon = balloon.getWeakerBalloon()
                     onBalloons.remove(balloon)

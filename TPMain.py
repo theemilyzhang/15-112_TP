@@ -21,6 +21,7 @@ def runGame():
         def appStarted(mode):
             mode.backgroundImage = mode.loadImage("sky.jpg")
             playsound("bgm.mp3", block=False)
+            mode.inInstructionsMode = False
 
         def mousePressed(mode, event):
             x = event.x
@@ -28,15 +29,28 @@ def runGame():
             width = mode.app.width
             height = mode.app.height
 
-            #easy button
+            #easy mode button
             if (width*1//10 <= x <= width*3//10 and
                 height*3//4 <= y <= height*7//8):
                 mode.app.setActiveMode(mode.app.easyMode)
 
-            #hard button
+            #hard mode button
             if (width*7//10 <= x <= width*9//10 and
                 height*3//4 <= y <= height*7//8):
                 mode.app.setActiveMode(mode.app.hardMode)
+
+            #instructions button
+            if (width*4//10 <= x <= width*6//10 and
+                height*25//32 <= y <=  height*27//32):
+                mode.inInstructionsMode = True
+
+            #back button in instructions
+            if mode.inInstructionsMode:
+                cx = mode.app.width//2
+                cy = mode.app.height//2
+                if (cx-280 <= x <= cx-220 and cy+240 <= y <= cy+280):
+                    mode.inInstructionsMode = False
+                    mode.app.setActiveMode(mode.app.splashScreenMode)
 
 
         def redrawAll(mode, canvas):
@@ -48,23 +62,40 @@ def runGame():
             canvas.create_text(width//2, height//2,
                                text="Bloons Tower Defense", font="Raleway 50")
 
-            #draw buttons
+            #easy mode button
             canvas.create_rectangle(width*1//10, height*3//4,
                                     width*3//10, height*7//8,
                                     fill="light blue")
             canvas.create_text(width*2//10, height*13//16,
                                text="Easy Mode", font="Raleway 35")
 
-            # canvas.create_rectangle(width*4//10, height*3//4,
-            #                         width*6//10, height*7//8,
-            #                         fill="light blue")
-            # canvas.create_text(width*5//10, height*13//16,
-            #                    text="Medium Mode", font="Raleway 35")
+            #hard mode button
             canvas.create_rectangle(width*7//10, height*3//4,
                                     width*9//10, height*7//8,
                                     fill="light blue")
             canvas.create_text(width*8//10, height*13//16,
                                text="Hard Mode", font="Raleway 35")
+
+            #instructions button
+            canvas.create_rectangle(width*4//10, height*25//32,
+                                    width*6//10, height*27//32,
+                                    fill="white")
+            canvas.create_text(width*5//10, height*13//16,
+                               text="Instructions", font="Raleway 25")
+
+            if mode.inInstructionsMode:
+                mode.drawInstructions(canvas)
+
+        def drawInstructions(mode, canvas):
+            cx = mode.app.width//2
+            cy = mode.app.height//2
+            canvas.create_rectangle(cx-300, cy-300, cx+300, cy+300, fill="white")
+            canvas.create_text(cx, cy-275, text="Instructions", font="raleway 30 bold")
+            #TODO add instructions here
+
+            #back button
+            canvas.create_rectangle(cx-280, cy+240, cx-220, cy+280, fill="light blue")
+            canvas.create_text(cx - 250, cy+260, text="Back", font="raleway 15")
 
 
     class EasyMode(Mode):
@@ -114,8 +145,9 @@ def runGame():
             #1: move balloons by ideal direction
             #2: turn disappearingBalloons on/off
             for balloon in mode.player.onBalloons:
-                if balloon.isFrozen:
-                    continue #never gets here
+                if balloon.frozenCountdown != 0:
+                    balloon.frozenCountdown -= 1
+                    continue
                 #1
                 direction = balloon.getDirection(mode.player.towers, mode.app.width, mode.app.height)
                 dx, dy = math.cos(direction), -math.sin(direction) #unit vectors
@@ -342,12 +374,13 @@ def runGame():
 
         def drawBalloons(mode, canvas):
             for balloon in mode.player.onBalloons:
+
                 if isinstance(balloon, Balloon.DisappearingBalloon) and not balloon.isVisible:
                     continue
 
                 cx, cy = balloon.position[0], balloon.position[1]
                 r = balloon.radius
-                if balloon.isFrozen:
+                if balloon.frozenCountdown != 0:
                     canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="white", width=0)
                 else:
                     canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill=balloon.color, width=0)

@@ -1,6 +1,4 @@
-L = [1, 2, 3]
+import random
 
-L2 = []
-
-L.extend(L2)
-print (L)
+for i in range(20):
+    print (random.randint(0, 5))

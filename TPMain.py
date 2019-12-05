@@ -22,6 +22,7 @@ def runGame():
             mode.backgroundImage = mode.loadImage("sky.jpg")
             playsound("bgm.mp3", block=False)
             mode.inInstructionsMode = False
+            mode.instructionsImage = mode.loadImage("instructions.png")
 
         def mousePressed(mode, event):
             x = event.x
@@ -48,7 +49,7 @@ def runGame():
             if mode.inInstructionsMode:
                 cx = mode.app.width//2
                 cy = mode.app.height//2
-                if (cx-280 <= x <= cx-220 and cy+240 <= y <= cy+280):
+                if (cx-280 <= x <= cx-220 and cy+260 <= y <= cy+280):
                     mode.inInstructionsMode = False
                     mode.app.setActiveMode(mode.app.splashScreenMode)
 
@@ -89,13 +90,13 @@ def runGame():
         def drawInstructions(mode, canvas):
             cx = mode.app.width//2
             cy = mode.app.height//2
-            canvas.create_rectangle(cx-300, cy-300, cx+300, cy+300, fill="white")
-            canvas.create_text(cx, cy-275, text="Instructions", font="raleway 30 bold")
-            #TODO add instructions here
+            canvas.create_rectangle(cx-300, cy-300, cx+300, cy+300, fill="white", width=0)
+            canvas.create_image (cx, cy-30, image=ImageTk.PhotoImage(mode.instructionsImage))
+            canvas.create_text(cx, cy-275, text="Help Screen", font="raleway 30 bold")
 
             #back button
-            canvas.create_rectangle(cx-280, cy+240, cx-220, cy+280, fill="light blue")
-            canvas.create_text(cx - 250, cy+260, text="Back", font="raleway 15")
+            canvas.create_rectangle(cx-280, cy+260, cx-220, cy+280, fill="light blue")
+            canvas.create_text(cx - 250, cy+270, text="Back", font="raleway 15")
 
 
     class EasyMode(Mode):
@@ -103,6 +104,8 @@ def runGame():
             mode.player = Player.Player()
             mode.board = Board.Board(mode.width, mode.height)
             mode.clock = 0
+            mode.balloonDelay = 15
+            mode.clearInstructions = False
 
             #images
             towerImageUnscaled = mode.loadImage("tower.png")
@@ -115,6 +118,7 @@ def runGame():
             mode.freezetowerImage = mode.scaleImage(freezetowerImageUnscaled, 1/15)
             cactusImageUnscaled = mode.loadImage("cactus.png")
             mode.cactusImage = mode.scaleImage(cactusImageUnscaled, 1/10)
+            mode.instructionsImage = mode.loadImage("instructions.png")
 
 
             mode.backgroundImage = mode.loadImage("sky.jpg")
@@ -127,7 +131,7 @@ def runGame():
             # BALLOONS
             ############################################################################################################
 
-            if (mode.clock % 10 == 0):
+            if (mode.clock % mode.balloonDelay == 0):
                 #a new balloon appears on screen (move a balloon from offBalloons to onBalloons)
                 if (len(mode.player.offBalloons) != 0):
                     mode.player.moveBalloonOn(mode.board)
@@ -242,7 +246,7 @@ def runGame():
                     mode.player.illegallyPlacedItem = False
                     mode.player.placingTower.location = (event.x, event.y)
                     mode.player.towers.append(mode.player.placingTower)
-                    mode.player.coins -= Tower.Tower.price
+                    mode.player.coins -= mode.player.placingTower.price
                     mode.player.placingTower = None
                 else:
                     mode.player.illegallyPlacedItem = True
@@ -257,6 +261,9 @@ def runGame():
                     mode.player.placingCactus = None
                 else:
                     mode.player.illegallyPlacedItem = True
+            else:
+                mode.clearInstructions = True
+
 
 
         def mouseMoved(mode, event):
@@ -268,20 +275,40 @@ def runGame():
 
         def keyPressed(mode, event):
             if (event.key == "t"):
-                if mode.player.coins >= Tower.Tower.price:
+                if mode.player.coins >= Tower.Tower((0,0)).price:
                     mode.player.placingTower = Tower.Tower((0, 0))
+                    mode.player.cantAfford = False
+                else:
+                    mode.player.cantAfford = True
+                    mode.clearInstructions = False
             elif (event.key == "s"):
-                if mode.player.coins >= Tower.SuperTower.price:
+                if mode.player.coins >= Tower.SuperTower((0,0)).price:
                     mode.player.placingTower = Tower.SuperTower((0, 0))
+                    mode.player.cantAfford = False
+                else:
+                    mode.player.cantAfford = True
+                    mode.clearInstructions = False
             elif (event.key == "8"):
-                if mode.player.coins >= Tower.OctoTower.price:
+                if mode.player.coins >= Tower.OctoTower((0,0)).price:
                     mode.player.placingTower = Tower.OctoTower((0, 0))
+                    mode.player.cantAfford = False
+                else:
+                    mode.player.cantAfford = True
+                    mode.clearInstructions = False
             elif (event.key == "f"):
-                if mode.player.coins >= Tower.FreezeTower.price:
+                if mode.player.coins >= Tower.FreezeTower((0,0)).price:
                     mode.player.placingTower = Tower.FreezeTower((0, 0))
+                    mode.player.cantAfford = False
+                else:
+                    mode.player.cantAfford = True
+                    mode.clearInstructions = False
             elif (event.key == "c"):
                 if mode.player.coins >= Cactus.Cactus.price:
                     mode.player.placingCactus = Cactus.Cactus((0, 0))
+                    mode.player.cantAfford = False
+                else:
+                    mode.player.cantAfford = True
+                    mode.clearInstructions = False
 
 
         def redrawAll(mode, canvas):
@@ -309,9 +336,9 @@ def runGame():
         def drawHelp(mode, canvas):
             cx = mode.app.width//2
             cy = mode.app.height//2
-            canvas.create_rectangle(cx-300, cy-300, cx+300, cy+300, fill="white")
+            canvas.create_rectangle(cx-300, cy-300, cx+300, cy+300, fill="white", width=0)
+            canvas.create_image (cx, cy-30, image=ImageTk.PhotoImage(mode.instructionsImage))
             canvas.create_text(cx, cy-275, text="Help Screen", font="raleway 30 bold")
-            #TODO add help instructions
 
         def drawCacti(mode, canvas):
             for cactus in mode.player.cacti:
@@ -324,23 +351,28 @@ def runGame():
         def drawWinScreen(mode, canvas):
             cx = mode.app.width//2
             cy = mode.app.height//2
-            canvas.create_rectangle(cx-200, cy-200, cx+200, cy+200, fill="white")
+            canvas.create_rectangle(cx-300, cy-300, cx+300, cy+300, fill="white")
             canvas.create_text(cx, cy, text="Congrats! You won!", font="raleway 30 bold")
 
         def drawLoseScreen(mode, canvas):
             cx = mode.app.width//2
             cy = mode.app.height//2
-            canvas.create_rectangle(cx-200, cy-200, cx+200, cy+200, fill="white")
+            canvas.create_rectangle(cx-300, cy-300, cx+300, cy+300, fill="white")
             canvas.create_text(cx, cy, text="Oh no! You lost.", font="raleway 30 bold")
 
         def drawInstructions(mode, canvas):
             #placing towers/cacti
-            if mode.player.illegallyPlacedItem:
+            if mode.clearInstructions:
+                pass
+            elif mode.player.illegallyPlacedItem:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place anything there. Try again.", font="raleway 30 bold")
+            elif mode.player.cantAfford:
+                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You can't afford that.", font="raleway 30 bold")
             elif mode.player.placingTower != None:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the " + mode.player.placingTower.name + " placed.", font="raleway 30 bold")
             elif mode.player.placingCactus != None:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the cactus placed.", font="raleway 30 bold")
+
 
         def drawNewTowerOutline(mode, canvas):
             x = mode.player.placingTower.location[0]
@@ -414,8 +446,9 @@ def runGame():
     class HardMode(EasyMode):
         def appStarted(mode):
             super().appStarted()
-            mode.player.hp = 20
             mode.player.offBalloons = mode.player.createBalloons("hard")
+            mode.balloonDelay = 10
+            mode.player.coins = 100
 
     class MyModalApp(ModalApp):
         def appStarted(app):

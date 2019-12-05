@@ -1,52 +1,57 @@
 import Balloon
 import Tower
 from mathFunctions import *
+import random
 
 class Player(object):
     def __init__(self):
-        self.hp = 2
-        self.coins = 200
+        self.hp = 20
+        self.coins = 150
         self.towers = []
         self.bullets = []
         self.cacti = []
         self.placingTower = None
         self.placingCactus = None
         self.illegallyPlacedItem = False
+        self.cantAfford = False
 
         self.offBalloons = self.createBalloons()
         self.onBalloons = []
 
     def createBalloons(self, difficulty="easy"):
         balloons = []
-
-        #TODO make it automatically generate based on level mode
-
-        if difficulty == "easy":
+        balloons.append(Balloon.DisappearingBalloon())
+        maxScore = 75
+        score = 0
+        if difficulty == "hard":
+            maxScore = 125
             balloons.append(Balloon.Blimp())
-            for i in range(5):
-                balloons.append(Balloon.PinkBalloon())
-            for i in range(5):
-                balloons.append(Balloon.YellowBalloon())
-            for i in range(5):
-                balloons.append(Balloon.GreenBalloon())
-            for i in range(5):
-                balloons.append(Balloon.BlueBalloon())
-            for i in range(5):
-                balloons.append(Balloon.Balloon())
-        else:
-            balloons.append(Balloon.Blimp())
-            for i in range(5):
-                balloons.append(Balloon.PinkBalloon())
-            for i in range(5):
-                balloons.append(Balloon.YellowBalloon())
-            for i in range(5):
-                balloons.append(Balloon.GreenBalloon())
-            for i in range(5):
-                balloons.append(Balloon.BlueBalloon())
-            for i in range(5):
-                balloons.append(Balloon.Balloon())
-            pass
 
+        #indexes:
+        #0: Balloon
+        #1: BlueBalloon
+        #2: GreenBalloon
+        #3: YellowBalloon
+        #4: PinkBalloon
+        #5: DisappearingBalloon
+        while score < maxScore:
+            index = random.randint(0, 5)
+            if index == 0:
+                balloons.append(Balloon.Balloon())
+            elif index == 1:
+                balloons.append(Balloon.BlueBalloon())
+            elif index == 2:
+                balloons.append(Balloon.GreenBalloon())
+            elif index == 3:
+                balloons.append(Balloon.YellowBalloon())
+            elif index == 4:
+                balloons.append(Balloon.PinkBalloon())
+            elif index == 5:
+                balloons.append(Balloon.DisappearingBalloon())
+            if index == 5:
+                score += 3
+            else:
+                score += (index+1)
 
         return balloons
 

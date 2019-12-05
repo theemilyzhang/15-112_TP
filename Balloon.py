@@ -266,7 +266,7 @@ class Blimp(Balloon):
         super().__init__()
         self.color = "grey"
         self.speed = 2
-        self.hp = 100
+        self.hp = 200
         self.radius = 25
 
     def getWeakerBalloon(self):

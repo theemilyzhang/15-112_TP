@@ -54,6 +54,7 @@ class OctoTower(Tower):
         super().__init__(location)
         self.name = "octo tower"
         self.towerRange = 400
+        self.price = 60
 
     def createBulletIfInRange(self, onBalloons):
         bullets = []
@@ -82,6 +83,7 @@ class FreezeTower(Tower):
     def __init__(self, location):
         super().__init__(location)
         self.name = "freeze tower"
+        self.price = 40
 
     def createBulletIfInRange(self, onBalloons):
         bullets = super().createBulletIfInRange(onBalloons)

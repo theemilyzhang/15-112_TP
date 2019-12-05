@@ -263,9 +263,9 @@ class PinkBalloon(Balloon):
 class Blimp(Balloon):
     def __init__(self):
         super().__init__()
-        self.color = "black"
-        self.speed = 4
-        self.hp = 100
+        self.color = "grey"
+        self.speed = 2
+        self.hp = 1000
         self.radius = 25
 
     def getWeakerBalloon(self):

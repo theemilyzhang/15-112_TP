@@ -42,22 +42,20 @@ class Tower(object):
         return []
 
 class SuperTower(Tower): #faster cooldown, shoots by predicting balloon position
-    price = 40
-    towerRange = 200
     def __init__(self, location):
         super().__init__(location)
         self.defaultCoolDown = 10
         self.currentCoolDown = self.defaultCoolDown - 1
         self.name = "super tower"
+        self.price = 40
 
     #TODO shoot by predicting balloon position
 
 class OctoTower(Tower):
-    price = 20
-    towerRange = 400
     def __init__(self, location):
         super().__init__(location)
         self.name = "octo tower"
+        self.towerRange = 400
 
     def createBulletIfInRange(self, onBalloons):
         bullets = []
@@ -83,8 +81,6 @@ class OctoTower(Tower):
         return bullets
 
 class FreezeTower(Tower):
-    price = 20
-    towerRange = 200
     def __init__(self, location):
         super().__init__(location)
         self.name = "freeze tower"

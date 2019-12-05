@@ -7,6 +7,7 @@ import Board
 import Balloon
 import Cactus
 from mathFunctions import *
+from playsound import playsound
 
 #animation and graphics framework from http://www.cs.cmu.edu/~112/notes/notes-animations-part1.html
 #modal app from http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
@@ -19,6 +20,7 @@ def runGame():
     class SplashScreenMode(Mode):
         def appStarted(mode):
             mode.backgroundImage = mode.loadImage("sky.jpg")
+            playsound("bgm.mp3", block=False)
 
         def mousePressed(mode, event):
             x = event.x
@@ -342,13 +344,16 @@ def runGame():
             for balloon in mode.player.onBalloons:
                 if isinstance(balloon, Balloon.DisappearingBalloon) and not balloon.isVisible:
                     continue
+
                 cx, cy = balloon.position[0], balloon.position[1]
                 r = balloon.radius
-
                 if balloon.isFrozen:
                     canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill="white", width=0)
                 else:
                     canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill=balloon.color, width=0)
+
+                if isinstance(balloon, Balloon.Blimp):
+                    canvas.create_text(cx, cy, text=str(balloon.hp), font="Raleway 10",)
 
         def drawTowers(mode, canvas):
             for tower in mode.player.towers:

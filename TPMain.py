@@ -14,6 +14,7 @@ from playsound import playsound
 #tower image from https://www.pngguru.com/free-transparent-background-png-clipart-lbpet/download
 #sky image from http://www.alpharoofinginc.com/roofing-sky-background-3-2-jpg/
 #cactus image from https://www.pexels.com/photo/three-potted-cactus-plants-1903965/
+#playsound from https://docs.microsoft.com/en-us/previous-versions/dd743680(v%3Dvs.85)
 
 def runGame():
 
@@ -61,7 +62,7 @@ def runGame():
 
             #draw logo
             canvas.create_text(width//2, height//2,
-                               text="Bloons Tower Defense", font="Raleway 50")
+                               text="B11oons 2ower Defense", font="Raleway 50")
 
             #easy mode button
             canvas.create_rectangle(width*1//10, height*3//4,
@@ -265,7 +266,6 @@ def runGame():
                 mode.clearInstructions = True
 
 
-
         def mouseMoved(mode, event):
             if mode.player.placingTower != None:
                 mode.player.placingTower.location = (event.x, event.y)
@@ -309,10 +309,15 @@ def runGame():
                 else:
                     mode.player.cantAfford = True
                     mode.clearInstructions = False
+            #shortcuts
+            elif (event.key == "L"): #shortcut to hp = 1
+                mode.player.hp = 1
+            elif (event.key == "W"): #shortcut to no more offBalloons
+                mode.player.offBalloons = []
 
 
         def redrawAll(mode, canvas):
-            mode.drawBoard(canvas) #includes bg image
+            mode.drawBoard(canvas)
             mode.drawCacti(canvas)
             mode.drawTowers(canvas)
             mode.drawBullets(canvas)
@@ -362,17 +367,15 @@ def runGame():
 
         def drawInstructions(mode, canvas):
             #placing towers/cacti
-            if mode.clearInstructions:
-                pass
+            if not mode.clearInstructions:
+                if mode.player.cantAfford:
+                    canvas.create_text(mode.app.width//2, mode.app.height//2, text="You can't afford that.", font="raleway 30 bold")
             elif mode.player.illegallyPlacedItem:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="You cannot place anything there. Try again.", font="raleway 30 bold")
-            elif mode.player.cantAfford:
-                canvas.create_text(mode.app.width//2, mode.app.height//2, text="You can't afford that.", font="raleway 30 bold")
             elif mode.player.placingTower != None:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the " + mode.player.placingTower.name + " placed.", font="raleway 30 bold")
             elif mode.player.placingCactus != None:
                 canvas.create_text(mode.app.width//2, mode.app.height//2, text="Click where you want the cactus placed.", font="raleway 30 bold")
-
 
         def drawNewTowerOutline(mode, canvas):
             x = mode.player.placingTower.location[0]
